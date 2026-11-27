@@ -1,6 +1,11 @@
 // ===== The Little LUXE — site logic (you normally don't need to edit this file) =====
+// Other scripts (account.js) talk to this one through window.TLL once TLL.ready resolves.
+let markReady;
+window.TLL = { ready: new Promise((r) => (markReady = r)) };
+
 (async function () {
   const S = window.STORE || {};
+  const AWS = S.aws || {};
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const root = document.documentElement;
@@ -17,7 +22,7 @@
     giftWrapPrice: num(S.giftWrapPrice, 49),
     budgetPrice: num(S.budgetPrice, 499),
   };
-  // Browser storage only remembers this visitor's bag; it can be unavailable (private mode), so never rely on it
+  // Browser storage only remembers things for this visitor; it can be unavailable (private mode), so never rely on it
   const saved = {
     get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } },
     set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch { /* ignore */ } },
@@ -52,7 +57,7 @@
     document.head.appendChild(sc);
   }
 
-  // ---------- products: from Google Sheet if set, else products.js ----------
+  // ---------- products: owner page (AWS) → Google Sheet → products.js ----------
   function parseCSV(text) {
     const rows = []; let row = [], field = "", q = false;
     for (let i = 0; i < text.length; i++) {
@@ -73,10 +78,26 @@
     const m = u.match(/drive\.google\.com\/.*?(?:\/d\/|[?&]id=)([\w-]{20,})/);
     return m ? `https://lh3.googleusercontent.com/d/${m[1]}=w1200` : u;
   };
+  async function fetchWithTimeout(url, ms = 6000) {
+    const ctl = new AbortController();
+    const t = setTimeout(() => ctl.abort(), ms);
+    try { return await fetch(url, { cache: "no-store", signal: ctl.signal }); } finally { clearTimeout(t); }
+  }
   async function loadProducts() {
+    if (AWS.cdnUrl) {
+      try {
+        const res = await fetchWithTimeout(`${AWS.cdnUrl.replace(/\/$/, "")}/catalog/products.json`);
+        if (res.ok) {
+          const list = (await res.json()).products || [];
+          if (list.length) return list;
+        }
+      } catch (e) {
+        console.warn("[The Little LUXE] Couldn't load products from the shop manager — trying the next source.", e);
+      }
+    }
     if (S.productsSheet) {
       try {
-        const res = await fetch(S.productsSheet, { cache: "no-store" });
+        const res = await fetchWithTimeout(S.productsSheet);
         if (!res.ok) throw new Error("HTTP " + res.status);
         const rows = parseCSV(await res.text()).filter((r) => r.some((c) => c.trim()));
         const head = rows.shift().map((h) => h.trim().toLowerCase().replace(/[\s_-]+/g, ""));
@@ -129,21 +150,44 @@
 
   const priceHtml = (p) => money(p.price) + (p.oldPrice ? ` <s>${money(p.oldPrice)}</s>` : "");
 
+  // ---------- wishlist (saved on this device; account.js also syncs it to the customer's account) ----------
+  let wish = new Set(saved.get("tll-wish", []).map(String).filter((id) => byId.has(id)));
+  const wishListeners = [];
+  const HEART = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-9.3-9.2C1.4 8 3.4 4.5 6.9 4.5c2.1 0 3.9 1.2 5.1 3 1.2-1.8 3-3 5.1-3 3.5 0 5.5 3.5 4.2 6.8-1.8 4.6-9.3 9.2-9.3 9.2z"/></svg>';
+  function setWish(ids, { silent = false } = {}) {
+    wish = new Set([...ids].map(String).filter((id) => byId.has(id)));
+    saved.set("tll-wish", [...wish]);
+    renderWishUI();
+    if (!silent) wishListeners.forEach((fn) => fn([...wish]));
+  }
+  function toggleWish(id) {
+    const next = new Set(wish);
+    const added = !next.has(id);
+    added ? next.add(id) : next.delete(id);
+    setWish(next);
+    toast(added ? "Saved to your wishlist" : "Removed from your wishlist");
+  }
+
   function card(p) {
     const badge = p.soldOut ? '<span class="badge sold">Sold out</span>'
       : p.isNew ? '<span class="badge">New</span>'
       : p.oldPrice ? '<span class="badge">Sale</span>' : "";
-    return `<button type="button" class="card" data-id="${esc(p.id)}" aria-label="${esc(p.name)}, ${esc(money(p.price))}${p.soldOut ? ", sold out" : ""}">
-      <span class="card-img">${thumb(p)}${badge}</span>
-      <span class="card-cat">${esc(p.category)}</span>
-      <span class="card-name">${esc(p.name)}</span>
-      <span class="card-price">${priceHtml(p)}</span>
-    </button>`;
+    const on = wish.has(p.id);
+    return `<div class="card-wrap">
+      <button type="button" class="card" data-id="${esc(p.id)}" aria-label="${esc(p.name)}, ${esc(money(p.price))}${p.soldOut ? ", sold out" : ""}">
+        <span class="card-img">${thumb(p)}${badge}</span>
+        <span class="card-cat">${esc(p.category)}</span>
+        <span class="card-name">${esc(p.name)}</span>
+        <span class="card-price">${priceHtml(p)}</span>
+      </button>
+      <button type="button" class="heart" data-wish="${esc(p.id)}" aria-pressed="${on}" aria-label="${on ? "Remove" : "Save"} ${esc(p.name)} ${on ? "from" : "to"} wishlist">${HEART}</button>
+    </div>`;
   }
 
   // ---------- New In ----------
   const newOnes = products.filter((p) => p.isNew).slice(0, 4);
-  $("#new-grid").innerHTML = newOnes.map(card).join("");
+  const renderNew = () => ($("#new-grid").innerHTML = newOnes.map(card).join(""));
+  renderNew();
   if (!newOnes.length) {
     $("#new").hidden = true;
     $$('a[href="#new"]').forEach((a) => (a.hidden = true));
@@ -197,7 +241,7 @@
   $("#sort").addEventListener("change", (e) => { shop.sort = e.target.value; renderShop(); });
   renderShop();
 
-  // ---------- dialogs (product pop-up and bag) ----------
+  // ---------- dialogs (product pop-up, bag, wishlist, account) ----------
   let openDlg = null, lastFocus = null;
   function lockScroll(on) {
     // both <html> and <body>, so the page behind doesn't scroll on iPhone
@@ -223,6 +267,7 @@
   }
   const focusables = (el) => $$('a[href], button:not([disabled]), input, textarea, select, summary', el)
     .filter((x) => !x.hidden && x.getClientRects().length);
+  const drawerClose = (el) => el.querySelector(".drawer-head .modal-close");
 
   // ---------- product pop-up with photo gallery ----------
   const modal = $("#modal"), gallery = $("#m-gallery");
@@ -272,6 +317,12 @@
     if (img) setOrigin(img, e);
   });
 
+  function renderModalWish() {
+    if (!current) return;
+    const on = wish.has(current.id), b = $("#m-wish");
+    b.setAttribute("aria-pressed", on);
+    b.lastElementChild.textContent = on ? "Saved to wishlist" : "Save to wishlist";
+  }
   function openProduct(id) {
     const p = byId.get(String(id));
     if (!p) return;
@@ -296,16 +347,19 @@
       order.href = igDM;
       order.textContent = p.soldOut ? "Notify me on Instagram" : "Ask on Instagram";
     }
+    renderModalWish();
     openDialog(modal, modal.querySelector(".modal-close"));
   }
 
   // ---------- shopping bag ----------
   const bagEl = $("#bag");
   let bag = saved.get("tll-bag", []).filter((l) => byId.has(String(l.id)) && !byId.get(String(l.id)).soldOut);
-  const extras = Object.assign({ wrap: false, note: "", name: "" }, saved.get("tll-bag-extras", {}));
+  const extras = Object.assign({ wrap: false, note: "", name: "", address: "" }, saved.get("tll-bag-extras", {}));
   $("#gift-wrap").checked = !!extras.wrap;
   $("#gift-note").value = extras.note || "";
   $("#cust-name").value = extras.name || "";
+  $("#cust-address").value = extras.address || "";
+  const checkoutListeners = [];
 
   function totals() {
     const lines = bag.map((l) => ({ ...l, p: byId.get(String(l.id)) }));
@@ -322,6 +376,7 @@
     out.push(`Total: ${money(t.total)}`);
     if (extras.wrap && extras.note.trim()) out.push("", `Gift note: "${extras.note.trim()}"`);
     if (extras.name.trim()) out.push("", `Name: ${extras.name.trim()}`);
+    if (extras.address.trim()) out.push(`Deliver to: ${extras.address.trim()}`);
     return out.join("\n");
   }
   function saveBag() { saved.set("tll-bag", bag.map(({ id, qty }) => ({ id, qty }))); saved.set("tll-bag-extras", extras); }
@@ -396,16 +451,27 @@
     if (!line.qty) bag = bag.filter((l) => l !== line);
     saveBag(); renderBag();
   }
-  function openBag() { renderBag(); openDialog(bagEl, bagEl.querySelector(".drawer-head .modal-close")); }
+  function openBag() { renderBag(); openDialog(bagEl, drawerClose(bagEl)); }
 
   $("#gift-wrap").addEventListener("change", (e) => { extras.wrap = e.target.checked; saveBag(); renderBag(); });
   $("#gift-note").addEventListener("input", (e) => { extras.note = e.target.value; saveBag(); renderBag(); });
   $("#cust-name").addEventListener("input", (e) => { extras.name = e.target.value; saveBag(); renderBag(); });
-  // Instagram can't take a pre-written message, so copy the order for the customer to paste
+  $("#cust-address").addEventListener("input", (e) => { extras.address = e.target.value; saveBag(); renderBag(); });
   $("#checkout").addEventListener("click", () => {
-    if (hasWhatsApp || !igDM) return;
-    const text = orderMessage(totals());
-    navigator.clipboard?.writeText(text).then(() => toast("Order copied — paste it in the Instagram chat"), () => {});
+    if (!canOrder) return;
+    const t = totals();
+    if (!t.count) return;
+    // let account.js save the order to the customer's account
+    const order = {
+      items: t.lines.map((l) => ({ id: l.p.id, name: l.p.name, price: l.p.price, qty: l.qty })),
+      subtotal: t.sub, shipping: t.ship, giftWrap: t.gift, total: t.total,
+      giftNote: extras.wrap ? extras.note.trim() : "", name: extras.name.trim(), address: extras.address.trim(),
+    };
+    checkoutListeners.forEach((fn) => fn(order));
+    // Instagram can't take a pre-written message, so copy the order for the customer to paste
+    if (!hasWhatsApp && igDM) {
+      navigator.clipboard?.writeText(orderMessage(t)).then(() => toast("Order copied — paste it in the Instagram chat"), () => {});
+    }
   });
 
   // UPI QR code (drawn only when someone opens it)
@@ -429,13 +495,42 @@
 
   renderBag();
 
+  // ---------- wishlist drawer & hearts ----------
+  const wishEl = $("#wish");
+  function renderWishUI() {
+    const n = wish.size;
+    $("#wish-count").textContent = n;
+    $("#wish-count").hidden = n === 0;
+    $("#wish-btn").setAttribute("aria-label", `Open wishlist, ${n} item${n === 1 ? "" : "s"}`);
+    $$("[data-wish]").forEach((b) => {
+      const on = wish.has(b.dataset.wish), name = byId.get(b.dataset.wish)?.name || "";
+      b.setAttribute("aria-pressed", on);
+      b.setAttribute("aria-label", `${on ? "Remove" : "Save"} ${name} ${on ? "from" : "to"} wishlist`);
+    });
+    renderModalWish();
+    const items = [...wish].map((id) => byId.get(id)).filter(Boolean);
+    $("#wish-empty").hidden = items.length > 0;
+    $("#wish-items").innerHTML = items.map((p) => `
+      <li class="bag-item">
+        <button type="button" class="bag-thumb as-btn" data-open="${esc(p.id)}" aria-label="View ${esc(p.name)}">${thumb(p)}</button>
+        <span class="bag-info">
+          <span class="bag-name">${esc(p.name)}</span>
+          <span class="bag-price">${priceHtml(p)}</span>
+          ${p.soldOut ? '<span class="muted small">Sold out</span>'
+            : `<button type="button" class="btn btn-line btn-sm" data-wish-add="${esc(p.id)}">Add to bag</button>`}
+        </span>
+        <button type="button" class="bag-remove" data-wish-remove="${esc(p.id)}" aria-label="Remove ${esc(p.name)} from wishlist">Remove</button>
+      </li>`).join("");
+  }
+  renderWishUI();
+
   // ---------- toast ----------
   let toastTimer;
   function toast(text) {
     const t = $("#toast");
     t.textContent = text; t.hidden = false;
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => (t.hidden = true), 3500);
+    toastTimer = setTimeout(() => (t.hidden = true), 3200);
   }
 
   // ---------- reviews (only shown when you've added some) ----------
@@ -485,10 +580,20 @@
   // ---------- clicks & keys ----------
   document.addEventListener("click", (e) => {
     const t = e.target;
+    const heart = t.closest("[data-wish]");
+    if (heart) return toggleWish(heart.dataset.wish);
     const c = t.closest(".card");
     if (c) return openProduct(c.dataset.id);
     if (t.closest("#bag-btn")) return openBag();
+    if (t.closest("#wish-btn")) { renderWishUI(); return openDialog(wishEl, drawerClose(wishEl)); }
     if (t.closest("#m-add") && current) { addToBag(current.id); return openBag(); }
+    if (t.closest("#m-wish") && current) return toggleWish(current.id);
+    const wAdd = t.closest("[data-wish-add]");
+    if (wAdd) { addToBag(wAdd.dataset.wishAdd); return openBag(); }
+    const wRm = t.closest("[data-wish-remove]");
+    if (wRm) return toggleWish(wRm.dataset.wishRemove);
+    const wOpen = t.closest("[data-open]");
+    if (wOpen) return openProduct(wOpen.dataset.open);
     if (t.closest("[data-close]")) return closeDialog();
     const closeBag = t.closest("[data-close-bag]");
     if (closeBag) {
@@ -517,7 +622,7 @@
     if (openDlg === modal && gCount > 1 && (e.key === "ArrowLeft" || e.key === "ArrowRight") && !/INPUT|TEXTAREA/.test(document.activeElement.tagName)) {
       goTo(gIndex + (e.key === "ArrowRight" ? 1 : -1));
     }
-    // keep keyboard focus inside the open pop-up / bag
+    // keep keyboard focus inside the open pop-up / drawer
     if (e.key === "Tab" && openDlg) {
       const f = focusables(openDlg);
       if (!f.length) return;
@@ -536,4 +641,20 @@
   if (igProfile) ig.href = igProfile;
   $(".contact-actions").hidden = !canOrder;
   if (!canOrder) $("#contact-text").textContent = "We're getting ready to take orders — check back very soon!";
+
+  // ---------- hooks for account.js ----------
+  Object.assign(window.TLL, {
+    products, byId, money, esc, toast, openDialog, closeDialog, drawerClose, canOrder,
+    wish: { get: () => [...wish], set: (ids) => setWish(ids, { silent: true }), onChange: (fn) => wishListeners.push(fn) },
+    details: {
+      get: () => ({ name: extras.name, address: extras.address }),
+      fill(d) { // only fills empty fields, never overwrites what the customer typed
+        if (d.name && !extras.name) { extras.name = d.name; $("#cust-name").value = d.name; }
+        if (d.address && !extras.address) { extras.address = d.address; $("#cust-address").value = d.address; }
+        saveBag(); renderBag();
+      },
+    },
+    onCheckout: (fn) => checkoutListeners.push(fn),
+  });
+  markReady(window.TLL);
 })();

@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Shop Manager — The Little LUXE</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="theme-color" content="#fbf7f2" />
+  <link rel="icon" type="image/png" href="brand/favicon.png" />
+  <link rel="apple-touch-icon" href="brand/apple-touch-icon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="admin-page">
+  <header class="header">
+    <div class="container header-inner">
+      <a href="./" class="logo" aria-label="The Little LUXE shop">
+        <svg class="logo-gem" viewBox="0 0 80 64" aria-hidden="true"><path d="M22 4 H58 L76 20 L40 60 L4 20 Z M4 20 H76 M22 4 L30 20 L40 60 M58 4 L50 20 L40 60 M30 20 L40 4 L50 20"/></svg>
+        <span class="logo-words"><span class="logo-small">The Little</span><span class="logo-big">LUXE</span></span>
+      </a>
+      <div class="admin-head-actions">
+        <a href="./" class="link-btn">View shop</a>
+        <button type="button" class="link-btn" id="signout" hidden>Sign out</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="section admin-main">
+    <div class="container" id="admin-root">
+      <p class="muted">Loading…</p>
+    </div>
+  </main>
+
+  <!-- Product editor -->
+  <div class="modal" id="editor" hidden>
+    <div class="modal-backdrop" data-close-editor></div>
+    <div class="modal-card editor-card" role="dialog" aria-modal="true" aria-labelledby="editor-title">
+      <button type="button" class="modal-close" data-close-editor aria-label="Close">×</button>
+      <form id="editor-form" class="editor-form" novalidate>
+        <h3 id="editor-title">Add a product</h3>
+        <label class="field"><span>Name *</span><input name="name" required maxlength="120" /></label>
+        <div class="editor-row">
+          <label class="field"><span>Category</span><input name="category" list="cat-list" maxlength="40" placeholder="Earrings" /></label>
+          <datalist id="cat-list"></datalist>
+          <label class="field"><span>Price (₹) *</span><input name="price" type="number" inputmode="numeric" min="0" step="1" required /></label>
+          <label class="field"><span>Old price (₹)</span><input name="oldPrice" type="number" inputmode="numeric" min="0" step="1" placeholder="Shows as Sale" /></label>
+        </div>
+        <label class="field"><span>Description</span><textarea name="description" rows="3" maxlength="1000"></textarea></label>
+        <div class="editor-checks">
+          <label class="check"><input type="checkbox" name="isNew" /> <span>Show in “New In”</span></label>
+          <label class="check"><input type="checkbox" name="soldOut" /> <span>Sold out</span></label>
+        </div>
+        <div class="field">
+          <span>Photos <span class="optional">(first one is the main photo)</span></span>
+          <div class="photo-grid" id="photo-grid"></div>
+          <label class="btn btn-line photo-add">
+            <input type="file" id="photo-input" accept="image/*" multiple hidden />
+            Add photos
+          </label>
+          <p class="acct-status" id="photo-status" aria-live="polite"></p>
+        </div>
+        <p class="acct-status" id="editor-error" role="alert"></p>
+        <div class="editor-actions">
+          <button type="submit" class="btn btn-dark">Save product</button>
+          <button type="button" class="btn btn-line" data-close-editor>Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+  <script src="products.js"></script>
+  <script src="auth.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>

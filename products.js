@@ -32,6 +32,15 @@ window.STORE = {
   // ----- Optional: free, private visitor stats from goatcounter.com -----
   // Sign up, pick a code (e.g. "thelittleluxe"), and put it here. Leave "" for no stats.
   statsCode: "",
+
+  // ----- Sign-in, customer accounts & the owner page (AWS) -----
+  // Filled in by aws/deploy.sh. Leave empty to turn accounts off (the wishlist still works).
+  aws: {
+    authDomain: "",   // Cognito sign-in page address
+    clientId: "",     // Cognito app client id (public, safe to share)
+    apiUrl: "",       // the shop's API address
+    cdnUrl: "",       // where product photos and the product list are served from
+  },
 };
 
 // ---------------------------------------------------------------------

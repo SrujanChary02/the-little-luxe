@@ -79,6 +79,36 @@ The "Kind words" section appears automatically once there's at least one.
 - **Visitor stats:** sign up free at [goatcounter.com](https://www.goatcounter.com), pick a code,
   and put it in `statsCode` in `products.js`. No cookie banner needed.
 
+## 6. Wishlist, customer accounts & the shop manager
+
+- **Wishlist** (♡ on every piece) and the remembered name/address in the bag work right away —
+  they're saved on the shopper's device.
+- **Sign in, customer accounts and the shop manager (`admin.html`)** run on AWS in the personal
+  account (327712415896, Mumbai `ap-south-1`): Cognito for sign-in, a Lambda function for the
+  API, DynamoDB for profiles/wishlists/orders, and a private S3 bucket behind CloudFront for
+  photos and the product list. Everything is defined in `aws/template.yaml`.
+
+**Deploy / update** (needs the `funny-shorts` AWS profile; the script refuses any other account):
+
+```bash
+bash aws/deploy.sh
+```
+
+It creates or updates the `tll-shop` stack, uploads `aws/api/index.mjs`, and writes the four
+`aws` values into `products.js`. Commit and push to put sign-in live.
+
+**Make yourself the owner:** sign up on the website with your email, then run
+`bash aws/make-owner.sh you@example.com`, sign out and back in. "Manage the shop" appears in
+your account, or go straight to `/admin.html`.
+
+**Shop manager:** add/edit/reorder/delete products, upload photos from your phone (they're
+resized automatically), tick New / Sold out, and update order status. As soon as you add your
+first product there, the shop uses those products instead of `products.js`.
+
+**Costs (small shop):** Cognito is free up to 10,000 monthly users; Lambda and CloudFront are
+within the always-free tier; DynamoDB and S3 cost a few rupees a month at most.
+Customer accounts, the table and the photo bucket are kept even if the stack is deleted.
+
 ## Logo & brand files
 
 See the `brand/` folder (open `brand/index.html` for the full kit). To re-export the logo files

@@ -64,9 +64,18 @@
         <a href="#gifts">Gifts</a>
         <a href="#about">About</a>
         <a href="#help">Help</a>
+        <a href="#account" class="nav-account" data-account hidden>Sign in</a>
       </nav>
       <div class="header-actions">
-        <button type="button" class="bag-btn" id="bag-btn" aria-label="Open bag, 0 items" aria-controls="bag">
+        <button type="button" class="icon-btn account-btn" id="account-btn" data-account aria-controls="account" hidden>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8.5" r="3.8"/><path d="M4.5 20c1.2-3.8 4-5.6 7.5-5.6s6.3 1.8 7.5 5.6"/></svg>
+          <span class="icon-label" id="account-label">Sign in</span>
+        </button>
+        <button type="button" class="icon-btn" id="wish-btn" aria-label="Open wishlist, 0 items" aria-controls="wish">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-9.3-9.2C1.4 8 3.4 4.5 6.9 4.5c2.1 0 3.9 1.2 5.1 3 1.2-1.8 3-3 5.1-3 3.5 0 5.5 3.5 4.2 6.8-1.8 4.6-9.3 9.2-9.3 9.2z"/></svg>
+          <span class="bag-count" id="wish-count" hidden>0</span>
+        </button>
+        <button type="button" class="icon-btn bag-btn" id="bag-btn" aria-label="Open bag, 0 items" aria-controls="bag">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14l-1.2 12H6.2z M9 8V6.5a3 3 0 0 1 6 0V8"/></svg>
           <span class="bag-count" id="bag-count" hidden>0</span>
         </button>
@@ -308,6 +317,10 @@
         <div class="modal-actions">
           <button type="button" class="btn btn-dark" id="m-add">Add to bag</button>
           <a class="btn btn-line" id="m-order" target="_blank" rel="noopener">Order on WhatsApp</a>
+          <button type="button" class="wish-toggle" id="m-wish" aria-pressed="false">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-9.3-9.2C1.4 8 3.4 4.5 6.9 4.5c2.1 0 3.9 1.2 5.1 3 1.2-1.8 3-3 5.1-3 3.5 0 5.5 3.5 4.2 6.8-1.8 4.6-9.3 9.2-9.3 9.2z"/></svg>
+            <span>Save to wishlist</span>
+          </button>
         </div>
       </div>
     </div>
@@ -332,6 +345,8 @@
           <label class="check"><input type="checkbox" id="gift-wrap" /> <span>Gift wrap it <span class="muted">(<span data-store="giftWrapPrice" data-money data-free="free">₹49</span>)</span></span></label>
           <label class="field" id="gift-note-wrap" hidden><span>Gift note</span><textarea id="gift-note" rows="2" maxlength="200" placeholder="Happy birthday! Love, …"></textarea></label>
           <label class="field"><span>Your name</span><input type="text" id="cust-name" autocomplete="name" maxlength="60" placeholder="So we know who's ordering" /></label>
+          <label class="field"><span>Delivery address <span class="optional">(optional)</span></span><textarea id="cust-address" rows="3" maxlength="300" autocomplete="street-address" placeholder="House no, street, area, city, PIN code"></textarea></label>
+          <p class="muted small">We remember these on this device for next time.</p>
         </div>
       </div>
       <div class="drawer-foot" id="bag-foot">
@@ -354,9 +369,42 @@
     </aside>
   </div>
 
+  <!-- ===== Wishlist ===== -->
+  <div class="drawer" id="wish" hidden>
+    <div class="drawer-backdrop" data-close-bag></div>
+    <aside class="drawer-panel" role="dialog" aria-modal="true" aria-labelledby="wish-title">
+      <div class="drawer-head">
+        <h3 id="wish-title">Your wishlist</h3>
+        <button type="button" class="modal-close static" data-close-bag aria-label="Close wishlist">×</button>
+      </div>
+      <div class="drawer-body">
+        <ul class="bag-items" id="wish-items"></ul>
+        <div class="bag-empty" id="wish-empty">
+          <p>No favourites yet — tap the ♡ on any piece to save it here.</p>
+          <button type="button" class="btn btn-line" data-close-bag data-goto="#shop">Browse the collection</button>
+        </div>
+        <p class="muted small wish-note" id="wish-note">Saved on this device.</p>
+      </div>
+    </aside>
+  </div>
+
+  <!-- ===== Account (only shown when sign-in is set up) ===== -->
+  <div class="drawer" id="account" hidden>
+    <div class="drawer-backdrop" data-close-bag></div>
+    <aside class="drawer-panel" role="dialog" aria-modal="true" aria-labelledby="account-title">
+      <div class="drawer-head">
+        <h3 id="account-title">Your account</h3>
+        <button type="button" class="modal-close static" data-close-bag aria-label="Close account">×</button>
+      </div>
+      <div class="drawer-body" id="account-body"></div>
+    </aside>
+  </div>
+
   <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
   <script src="products.js"></script>
+  <script src="auth.js"></script>
   <script src="app.js"></script>
+  <script src="account.js"></script>
 </body>
 </html>
