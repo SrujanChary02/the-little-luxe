@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>The Little LUXE — Everyday Jewelry</title>
+  <meta name="description" content="The Little LUXE — dainty, everyday accessories and jewelry you'll never want to take off." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- ===== Announcement bar ===== -->
+  <div class="announce">Free shipping on orders above ₹999 · New pieces every week</div>
+
+  <!-- ===== Header ===== -->
+  <header class="header">
+    <div class="container header-inner">
+      <a href="#top" class="logo" aria-label="The Little LUXE home">
+        <span class="logo-small">The Little</span>
+        <span class="logo-big">LUXE</span>
+      </a>
+      <button class="menu-btn" aria-label="Open menu" aria-expanded="false">
+        <span></span><span></span>
+      </button>
+      <nav class="nav">
+        <a href="#shop">Shop</a>
+        <a href="#new">New In</a>
+        <a href="#about">About</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top">
+    <!-- ===== Hero ===== -->
+    <section class="hero">
+      <div class="container hero-inner">
+        <div class="hero-text">
+          <p class="eyebrow">Everyday accessories</p>
+          <h1>Little luxuries<br /><em>for every day.</em></h1>
+          <p class="lead">Dainty, affordable jewelry made to be worn from morning coffee to late-night plans — and never taken off.</p>
+          <div class="hero-actions">
+            <a href="#shop" class="btn btn-dark">Shop the collection</a>
+            <a href="#new" class="btn btn-line">See what's new</a>
+          </div>
+        </div>
+        <div class="hero-art" aria-hidden="true">
+          <div class="hero-circle"></div>
+          <svg class="hero-ring" viewBox="0 0 200 200">
+            <circle cx="100" cy="112" r="58" fill="none" stroke="currentColor" stroke-width="6"/>
+            <path d="M84 56 L100 34 L116 56 L100 66 Z" fill="none" stroke="currentColor" stroke-width="3"/>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Promise strip ===== -->
+    <section class="promise">
+      <div class="container promise-inner">
+        <div><strong>Anti-tarnish</strong><span>Made for daily wear</span></div>
+        <div><strong>Skin friendly</strong><span>Hypoallergenic finishes</span></div>
+        <div><strong>Gift ready</strong><span>Packed with love</span></div>
+      </div>
+    </section>
+
+    <!-- ===== New In ===== -->
+    <section id="new" class="section">
+      <div class="container">
+        <div class="section-head">
+          <p class="eyebrow">Just dropped</p>
+          <h2>New In</h2>
+        </div>
+        <div class="grid" id="new-grid"></div>
+      </div>
+    </section>
+
+    <!-- ===== Shop ===== -->
+    <section id="shop" class="section section-alt">
+      <div class="container">
+        <div class="section-head">
+          <p class="eyebrow">The collection</p>
+          <h2>Shop All</h2>
+        </div>
+        <div class="filters" id="filters" role="tablist"></div>
+        <div class="grid" id="shop-grid"></div>
+        <p class="empty" id="empty" hidden>No pieces in this category yet — check back soon!</p>
+      </div>
+    </section>
+
+    <!-- ===== About ===== -->
+    <section id="about" class="section">
+      <div class="container about">
+        <div class="about-art" aria-hidden="true">
+          <span>TLL</span>
+        </div>
+        <div>
+          <p class="eyebrow">Our story</p>
+          <h2>Small pieces, big feelings.</h2>
+          <p>The Little LUXE started with a simple idea: everyday jewelry should feel special without costing a fortune. Every piece is hand-picked for its delicate design, comfort and staying power — so you can layer, stack and wear it every single day.</p>
+          <p>Whether it's a treat for yourself or a gift for someone you love, we hope our little luxuries become part of your story.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Contact ===== -->
+    <section id="contact" class="section section-dark">
+      <div class="container contact">
+        <p class="eyebrow">Say hello</p>
+        <h2>Order &amp; enquiries</h2>
+        <p>Found something you love? Message us to order — we usually reply within a few hours.</p>
+        <div class="contact-actions">
+          <a class="btn btn-gold" id="wa-link" target="_blank" rel="noopener">Message on WhatsApp</a>
+          <a class="btn btn-line-light" id="ig-link" target="_blank" rel="noopener">Follow on Instagram</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <span>© <span id="year"></span> The Little LUXE</span>
+      <span>Everyday jewelry, made to be loved.</span>
+    </div>
+  </footer>
+
+  <!-- ===== Product modal ===== -->
+  <div class="modal" id="modal" hidden>
+    <div class="modal-backdrop" data-close></div>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="m-name">
+      <button class="modal-close" data-close aria-label="Close">×</button>
+      <div class="modal-img" id="m-img"></div>
+      <div class="modal-body">
+        <p class="eyebrow" id="m-cat"></p>
+        <h3 id="m-name"></h3>
+        <p class="price" id="m-price"></p>
+        <p id="m-desc"></p>
+        <p class="stock" id="m-stock"></p>
+        <a class="btn btn-dark" id="m-order" target="_blank" rel="noopener">Order on WhatsApp</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="products.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
