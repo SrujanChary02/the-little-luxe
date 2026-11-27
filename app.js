@@ -78,22 +78,23 @@ window.TLL = { ready: new Promise((r) => (markReady = r)) };
     const m = u.match(/drive\.google\.com\/.*?(?:\/d\/|[?&]id=)([\w-]{20,})/);
     return m ? `https://lh3.googleusercontent.com/d/${m[1]}=w1200` : u;
   };
-  async function fetchWithTimeout(url, ms = 6000) {
+  async function fetchWithTimeout(url, { ms = 6000, cache = "no-store" } = {}) {
     const ctl = new AbortController();
     const t = setTimeout(() => ctl.abort(), ms);
-    try { return await fetch(url, { cache: "no-store", signal: ctl.signal }); } finally { clearTimeout(t); }
+    try { return await fetch(url, { cache, signal: ctl.signal }); } finally { clearTimeout(t); }
   }
   async function loadProducts() {
     if (AWS.cdnUrl) {
-      try {
-        const res = await fetchWithTimeout(`${AWS.cdnUrl.replace(/\/$/, "")}/catalog/products.json`);
-        if (res.ok) {
-          const list = (await res.json()).products || [];
-          if (list.length) return list;
-        }
-      } catch (e) {
-        console.warn("[The Little LUXE] Couldn't load products from the shop manager — trying the next source.", e);
-      }
+      // Loaded as a script (not fetch) so no CORS headers are needed — see aws/api/index.mjs
+      const list = await new Promise((done) => {
+        const s = document.createElement("script");
+        const t = setTimeout(() => done([]), 6000);
+        s.src = `${AWS.cdnUrl.replace(/\/$/, "")}/catalog/products.js`;
+        s.onload = () => { clearTimeout(t); done((window.TLL_CATALOG && window.TLL_CATALOG.products) || []); };
+        s.onerror = () => { clearTimeout(t); done([]); }; // no list yet (owner hasn't added products) → next source
+        document.head.appendChild(s);
+      });
+      if (list.length) return list;
     }
     if (S.productsSheet) {
       try {

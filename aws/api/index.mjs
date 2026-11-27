@@ -170,10 +170,19 @@ async function route(method, path, event, body) {
       if (p.oldPrice) out.oldPrice = int(p.oldPrice);
       return out;
     });
-    await s3.send(new PutObjectCommand({
-      Bucket: BUCKET, Key: "catalog/products.json", ContentType: "application/json",
-      CacheControl: "public, max-age=30", Body: JSON.stringify({ updatedAt: new Date().toISOString(), products }),
-    }));
+    const catalog = JSON.stringify({ updatedAt: new Date().toISOString(), products });
+    await Promise.all([
+      s3.send(new PutObjectCommand({
+        Bucket: BUCKET, Key: "catalog/products.json", ContentType: "application/json",
+        CacheControl: "public, max-age=30", Body: catalog,
+      })),
+      // The website loads this script version: browsers don't need CORS headers for scripts, and
+      // CloudFront's CORS headers go missing on Chrome requests that carry a "priority" header.
+      s3.send(new PutObjectCommand({
+        Bucket: BUCKET, Key: "catalog/products.js", ContentType: "application/javascript; charset=utf-8",
+        CacheControl: "public, max-age=30", Body: `window.TLL_CATALOG=${catalog};`,
+      })),
+    ]);
     return { count: products.length };
   }
 

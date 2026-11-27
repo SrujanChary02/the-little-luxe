@@ -36,10 +36,10 @@ window.STORE = {
   // ----- Sign-in, customer accounts & the owner page (AWS) -----
   // Filled in by aws/deploy.sh. Leave empty to turn accounts off (the wishlist still works).
   aws: {
-    authDomain: "",   // Cognito sign-in page address
-    clientId: "",     // Cognito app client id (public, safe to share)
-    apiUrl: "",       // the shop's API address
-    cdnUrl: "",       // where product photos and the product list are served from
+    authDomain: "https://thelittleluxe-shop.auth.ap-south-1.amazoncognito.com",   // Cognito sign-in page address
+    clientId: "c0gjimc82qdfh053f3o8k4s28",     // Cognito app client id (public, safe to share)
+    apiUrl: "https://oue3go3du4ahlp4fsekgjs7bve0fuzal.lambda-url.ap-south-1.on.aws",       // the shop's API address
+    cdnUrl: "https://d1zm4a7bfl396u.cloudfront.net",       // where product photos and the product list are served from
   },
 };
 
