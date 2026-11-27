@@ -6,8 +6,9 @@
 window.STORE = {
   name: "The Little LUXE",
   currency: "₹",
-  whatsapp: "919999999999",   // ← your WhatsApp number with country code, digits only
-  instagram: "thelittleluxe", // ← your Instagram handle
+  whatsapp: "",               // ← your WhatsApp number with country code, e.g. "919876543210"
+                              //   (until this is filled in, order buttons send customers to Instagram instead)
+  instagram: "thelittleluxe", // ← your Instagram handle, without the @
 };
 
 // ---------------------------------------------------------------------

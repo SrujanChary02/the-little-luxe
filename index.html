@@ -41,10 +41,10 @@
           <span class="logo-big">LUXE</span>
         </span>
       </a>
-      <button class="menu-btn" aria-label="Open menu" aria-expanded="false">
+      <button type="button" class="menu-btn" aria-label="Open menu" aria-expanded="false" aria-controls="site-nav">
         <span></span><span></span>
       </button>
-      <nav class="nav">
+      <nav class="nav" id="site-nav" aria-label="Main">
         <a href="#shop">Shop</a>
         <a href="#new">New In</a>
         <a href="#about">About</a>
@@ -107,7 +107,7 @@
           <p class="eyebrow">The collection</p>
           <h2>Shop All</h2>
         </div>
-        <div class="filters" id="filters" role="tablist"></div>
+        <div class="filters" id="filters" role="group" aria-label="Filter by category"></div>
         <div class="grid" id="shop-grid"></div>
         <p class="empty" id="empty" hidden>No pieces in this category yet — check back soon!</p>
       </div>
@@ -159,7 +159,7 @@
   <div class="modal" id="modal" hidden>
     <div class="modal-backdrop" data-close></div>
     <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="m-name">
-      <button class="modal-close" data-close aria-label="Close">×</button>
+      <button type="button" class="modal-close" data-close aria-label="Close">×</button>
       <div class="modal-img" id="m-img"></div>
       <div class="modal-body">
         <p class="eyebrow" id="m-cat"></p>
