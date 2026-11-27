@@ -17,7 +17,8 @@
   const user = A.user();
   if (!user) {
     root.innerHTML = `<div class="admin-card"><h1>Shop manager</h1><p class="muted">Sign in with the owner account to manage products and orders.</p>
-      <button type="button" class="btn btn-dark" id="signin">Sign in</button></div>`;
+      <div class="acct-actions" style="width:100%;max-width:320px">${A.providerButtons()}
+      <button type="button" class="btn btn-dark btn-block" id="signin">Sign in with email</button></div></div>`;
     $("#signin").onclick = () => A.signIn();
     return;
   }

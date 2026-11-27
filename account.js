@@ -39,6 +39,8 @@
           <li>See your past orders and their status</li>
         </ul>
         <div class="acct-actions">
+          ${A.providerButtons()}
+          ${A.providerButtons() ? '<p class="or-line"><span>or use your email</span></p>' : ""}
           <button type="button" class="btn btn-dark btn-block" data-signin>Sign in</button>
           <button type="button" class="btn btn-line btn-block" data-signup>Create an account</button>
         </div>

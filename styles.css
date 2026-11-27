@@ -650,3 +650,13 @@ h2 em { font-style: italic; color: var(--gold-dark); }
 @media (max-width: 600px) { .grid { gap: 28px 12px; } .btn { padding: 14px 24px; } }
 .btn-line, .btn-line-light { background: transparent; }
 .btn-line-light:hover { background: var(--ivory); color: var(--ink); }
+
+/* ===== "Continue with Google" button ===== */
+.btn-social {
+  display: flex; align-items: center; justify-content: center; gap: 12px; background: #fff; color: #1f1f1f;
+  border: 1px solid #c9c2bb; font-family: var(--sans); font-weight: 500; letter-spacing: .04em; text-transform: none; font-size: .95rem;
+}
+.btn-social:hover { background: #f7f3ef; }
+.btn-social svg { width: 20px; height: 20px; flex: none; }
+.or-line { display: flex; align-items: center; gap: 12px; color: var(--muted); font-size: .78rem; margin: 4px 0; }
+.or-line::before, .or-line::after { content: ""; flex: 1; height: 1px; background: var(--line); }

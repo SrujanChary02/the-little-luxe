@@ -15,6 +15,12 @@ Parameters:
   SitePath:
     Type: String
     Default: /the-little-luxe/
+  IdentityProviders:
+    Type: CommaDelimitedList
+    Default: COGNITO
+    Description: >
+      Sign-in options for the website, e.g. COGNITO,Google. Social providers are added (with their secret) in the
+      Cognito console first; aws/deploy.sh fills this in automatically from whatever exists.
 
 Resources:
   # ---------- Customers & sign-in ----------
@@ -73,7 +79,7 @@ Resources:
       AllowedOAuthFlowsUserPoolClient: true
       AllowedOAuthFlows: [code]
       AllowedOAuthScopes: [openid, email, profile]
-      SupportedIdentityProviders: [COGNITO]
+      SupportedIdentityProviders: !Ref IdentityProviders
       CallbackURLs:
         - !Sub "${SiteOrigin}${SitePath}"
         - !Sub "${SiteOrigin}${SitePath}admin.html"

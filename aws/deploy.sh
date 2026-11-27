@@ -17,10 +17,20 @@ if [ "$ACCOUNT" != "$EXPECTED_ACCOUNT" ]; then
 fi
 echo "Deploying to account $ACCOUNT ($REGION)…"
 
+# Switch on every sign-in provider that exists in the user pool (e.g. Google, added in the Cognito console)
+POOL=$(aws cloudformation describe-stacks --stack-name "$STACK" --query "Stacks[0].Outputs[?OutputKey=='UserPoolId'].OutputValue" --output text 2>/dev/null || true)
+SOCIAL=""
+if [ -n "$POOL" ] && [ "$POOL" != "None" ]; then
+  SOCIAL=$(aws cognito-idp list-identity-providers --user-pool-id "$POOL" --query 'Providers[].ProviderName' --output text | tr '\t' ',')
+fi
+PROVIDERS="COGNITO${SOCIAL:+,$SOCIAL}"
+echo "Sign-in options: $PROVIDERS"
+
 aws cloudformation deploy \
   --stack-name "$STACK" \
   --template-file aws/template.yaml \
   --capabilities CAPABILITY_IAM \
+  --parameter-overrides "IdentityProviders=$PROVIDERS" \
   --no-fail-on-empty-changeset
 
 echo "Uploading the API code…"
@@ -33,7 +43,7 @@ rm -rf "$TMP"
 
 echo "Writing the settings into products.js…"
 aws cloudformation describe-stacks --stack-name "$STACK" --query 'Stacks[0].Outputs' --output json > aws/outputs.json
-node -e '
+SOCIAL="$SOCIAL" node -e '
   const fs = require("fs");
   const out = Object.fromEntries(JSON.parse(fs.readFileSync("aws/outputs.json")).map(o => [o.OutputKey, o.OutputValue]));
   let s = fs.readFileSync("products.js", "utf8");
@@ -42,6 +52,8 @@ node -e '
   set("clientId", out.ClientId);
   set("apiUrl", out.ApiUrl.replace(/\/$/, ""));
   set("cdnUrl", out.CdnUrl);
+  const social = (process.env.SOCIAL || "").split(",").filter(Boolean);
+  s = s.replace(/(\n\s*providers: )\[[^\]]*\]/, `$1${JSON.stringify(social)}`);
   fs.writeFileSync("products.js", s);
   console.log(JSON.stringify(out, null, 2));
 '
