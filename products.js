@@ -7,8 +7,8 @@ window.STORE = {
   name: "The Little LUXE",
   currency: "₹",
   whatsapp: "",               // ← your WhatsApp number with country code, e.g. "919876543210"
-                              //   (until this is filled in, order buttons send customers to Instagram instead)
-  instagram: "thelittleluxe", // ← your Instagram handle, without the @
+  instagram: "",              // ← your Instagram handle without the @ (leave empty until you create one)
+  // Until at least one of these is filled in, the site shows "Ordering opens soon" instead of order buttons.
 };
 
 // ---------------------------------------------------------------------

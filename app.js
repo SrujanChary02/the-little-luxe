@@ -172,6 +172,8 @@
   if (hasWhatsApp) wa.href = waLink(`Hi ${S.name}! I have a question.`);
   ig.hidden = !igProfile;
   if (igProfile) ig.href = igProfile;
-  if (!hasWhatsApp && !igProfile) $(".contact-actions").innerHTML = '<p class="soon">Ordering opens soon — check back shortly!</p>';
+  const noContact = !hasWhatsApp && !igProfile;
+  $(".contact-actions").hidden = noContact;
+  if (noContact) $("#contact-text").textContent = "We're getting ready to take orders — check back very soon!";
   $("#year").textContent = new Date().getFullYear();
 })();

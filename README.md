@@ -11,5 +11,6 @@ Website for The Little LUXE — everyday accessories & jewelry.
 `products.js` exactly the same. The live site treats `Photo.JPG` and `photo.jpg` as different
 files. If a photo can't be found, the site shows the placeholder drawing instead.
 
-**Contact:** set your WhatsApp number at the top of `products.js`. Until it's set, order
-buttons send customers to your Instagram DMs.
+**Contact:** set your WhatsApp number (and Instagram, once you have one) at the top of
+`products.js`. Until at least one is set, the site shows "Ordering opens soon" instead of
+order buttons.
