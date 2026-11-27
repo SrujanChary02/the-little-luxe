@@ -402,7 +402,7 @@ button.btn { font-family: var(--sans); }
 /* ===== Header on small phones ===== */
 .nav-account { display: none; }
 @media (max-width: 900px) { .nav-account:not([hidden]) { display: block; } }
-@media (max-width: 560px) { .account-btn { display: none !important; } }
+@media (max-width: 359px) { .account-btn { display: none !important; } } /* only the smallest phones; Sign in stays in the menu */
 @media (max-width: 400px) {
   .header-actions { gap: 0; }
   .icon-btn { min-width: 36px; }
