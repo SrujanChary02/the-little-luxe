@@ -1,179 +1,539 @@
 // ===== The Little LUXE — site logic (you normally don't need to edit this file) =====
-(function () {
+(async function () {
   const S = window.STORE || {};
-  const products = window.PRODUCTS || [];
-  const $ = (s) => document.querySelector(s);
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const root = document.documentElement;
 
+  // ---------- helpers ----------
   // Escape text so product names like  Pearl "Drop" <Hoops>  can't break the page
   const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-  const money = (n) => (S.currency || "₹") + Number(n).toLocaleString("en-IN");
+  const num = (v, d) => (v === "" || v == null || isNaN(Number(v)) ? d : Number(v));
+  const money = (n) => (S.currency || "₹") + Number(n || 0).toLocaleString("en-IN");
+  const yes = (v) => v === true || /^(true|yes|y|1|x|✓)$/i.test(String(v ?? "").trim());
+  const CFG = {
+    freeShippingAbove: num(S.freeShippingAbove, 999),
+    shippingFee: num(S.shippingFee, 79),
+    giftWrapPrice: num(S.giftWrapPrice, 49),
+    budgetPrice: num(S.budgetPrice, 499),
+  };
+  // Browser storage only remembers this visitor's bag; it can be unavailable (private mode), so never rely on it
+  const saved = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch { /* ignore */ } },
+  };
 
-  // ----- How customers reach you -----
+  // ---------- how customers reach you ----------
   const waNumber = String(S.whatsapp || "").replace(/\D/g, "");
   const hasWhatsApp = waNumber.length >= 10 && !/^(91)?9{10}$/.test(waNumber); // ignore the old 99999 placeholder
   const igHandle = String(S.instagram || "").replace(/^@/, "").trim();
-  const waLink = (text) => `https://wa.me/${waNumber}?text=${encodeURIComponent(text)}`;
   const igProfile = igHandle ? `https://instagram.com/${igHandle}` : "";
   const igDM = igHandle ? `https://ig.me/m/${igHandle}` : "";
+  const canOrder = hasWhatsApp || !!igDM;
+  const waLink = (text) => `https://wa.me/${waNumber}?text=${encodeURIComponent(text)}`;
 
-  // Points a button at WhatsApp, or Instagram DMs if no WhatsApp number is set yet
-  function setOrderLink(a, message, waLabel) {
-    a.removeAttribute("aria-disabled");
-    if (hasWhatsApp) { a.href = waLink(message); a.textContent = waLabel; return; }
-    if (igDM) { a.href = igDM; a.textContent = waLabel.replace("WhatsApp", "Instagram"); return; }
-    a.removeAttribute("href");
-    a.setAttribute("aria-disabled", "true");
-    a.textContent = "Ordering opens soon";
+  // ---------- fill in settings shown in the text (prices, days…) ----------
+  $$("[data-store]").forEach((el) => {
+    const key = el.dataset.store;
+    const v = key in CFG ? CFG[key] : S[key];
+    if (v == null || v === "") return;
+    el.textContent = "money" in el.dataset ? (Number(v) === 0 && el.dataset.free ? el.dataset.free : money(v)) : v;
+  });
+  if (CFG.freeShippingAbove <= 0) $(".announce").textContent = "Free shipping on every order · New pieces every week";
+  $$("[data-cod]").forEach((el) => (el.hidden = !S.cashOnDelivery));
+  $("#year").textContent = new Date().getFullYear();
+
+  // Optional free visitor stats (GoatCounter) — set statsCode in products.js
+  if (S.statsCode) {
+    const sc = document.createElement("script");
+    sc.async = true;
+    sc.src = "https://gc.zgo.at/count.js";
+    sc.dataset.goatcounter = `https://${encodeURIComponent(S.statsCode)}.goatcounter.com/count`;
+    document.head.appendChild(sc);
   }
 
-  // ----- Product images: line-art placeholder when there's no photo, or the photo fails to load -----
+  // ---------- products: from Google Sheet if set, else products.js ----------
+  function parseCSV(text) {
+    const rows = []; let row = [], field = "", q = false;
+    for (let i = 0; i < text.length; i++) {
+      const c = text[i];
+      if (q) {
+        if (c === '"') { if (text[i + 1] === '"') { field += '"'; i++; } else q = false; }
+        else field += c;
+      } else if (c === '"') q = true;
+      else if (c === ",") { row.push(field); field = ""; }
+      else if (c === "\n") { row.push(field); rows.push(row); row = []; field = ""; }
+      else if (c !== "\r") field += c;
+    }
+    if (field || row.length) { row.push(field); rows.push(row); }
+    return rows;
+  }
+  // Google Drive share links → direct image links
+  const imgLink = (u) => {
+    const m = u.match(/drive\.google\.com\/.*?(?:\/d\/|[?&]id=)([\w-]{20,})/);
+    return m ? `https://lh3.googleusercontent.com/d/${m[1]}=w1200` : u;
+  };
+  async function loadProducts() {
+    if (S.productsSheet) {
+      try {
+        const res = await fetch(S.productsSheet, { cache: "no-store" });
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        const rows = parseCSV(await res.text()).filter((r) => r.some((c) => c.trim()));
+        const head = rows.shift().map((h) => h.trim().toLowerCase().replace(/[\s_-]+/g, ""));
+        const list = rows.map((r) => Object.fromEntries(head.map((h, i) => [h, (r[i] || "").trim()]))).filter((o) => o.name);
+        if (list.length) return list.map((o, i) => ({
+          id: o.id || "s" + i, name: o.name, category: o.category || "Jewelry",
+          price: num(o.price, 0), oldPrice: num(o.oldprice, undefined),
+          images: (o.images || o.image || "").split(/[|\n]+/).map((s) => s.trim()).filter(Boolean),
+          description: o.description, isNew: yes(o.isnew), soldOut: yes(o.soldout),
+        }));
+      } catch (e) {
+        console.warn("[The Little LUXE] Couldn't load the Google Sheet — showing products.js instead.", e);
+      }
+    }
+    return window.PRODUCTS || [];
+  }
+  const products = (await loadProducts()).map((p, i) => ({
+    ...p,
+    id: String(p.id ?? i),
+    price: num(p.price, 0),
+    oldPrice: p.oldPrice ? num(p.oldPrice, undefined) : undefined,
+    images: (Array.isArray(p.images) ? p.images : p.image ? [p.image] : []).map(imgLink),
+    soldOut: yes(p.soldOut), isNew: yes(p.isNew), _order: i,
+  }));
+  const byId = new Map(products.map((p) => [p.id, p]));
+
+  // ---------- product images ----------
   const ICONS = {
     Earrings: '<svg viewBox="0 0 100 100"><circle cx="35" cy="22" r="4" fill="currentColor"/><path d="M35 26v10" stroke="currentColor" stroke-width="2"/><circle cx="35" cy="56" r="20" fill="none" stroke="currentColor" stroke-width="3"/><circle cx="68" cy="22" r="4" fill="currentColor"/><path d="M68 26v14" stroke="currentColor" stroke-width="2"/><path d="M68 40l-9 22h18z" fill="none" stroke="currentColor" stroke-width="3"/></svg>',
     Necklaces: '<svg viewBox="0 0 100 100"><path d="M15 15 Q50 80 85 15" fill="none" stroke="currentColor" stroke-width="2.5"/><path d="M50 58 l8 10 -8 12 -8 -12z" fill="none" stroke="currentColor" stroke-width="3"/></svg>',
     Rings: '<svg viewBox="0 0 100 100"><circle cx="50" cy="58" r="26" fill="none" stroke="currentColor" stroke-width="4"/><path d="M42 30 l8 -12 8 12 -8 6z" fill="none" stroke="currentColor" stroke-width="2.5"/></svg>',
     Bracelets: '<svg viewBox="0 0 100 100"><ellipse cx="50" cy="50" rx="36" ry="22" fill="none" stroke="currentColor" stroke-width="4"/><circle cx="50" cy="72" r="5" fill="currentColor"/></svg>',
     Anklets: '<svg viewBox="0 0 100 100"><path d="M14 40 Q50 75 86 40" fill="none" stroke="currentColor" stroke-width="2.5" stroke-dasharray="4 5"/><circle cx="34" cy="58" r="4" fill="currentColor"/><circle cx="50" cy="62" r="4" fill="currentColor"/><circle cx="66" cy="58" r="4" fill="currentColor"/></svg>',
+    "Gift Sets": '<svg viewBox="0 0 100 100"><rect x="20" y="42" width="60" height="40" fill="none" stroke="currentColor" stroke-width="3"/><rect x="16" y="32" width="68" height="12" fill="none" stroke="currentColor" stroke-width="3"/><path d="M50 32v50" stroke="currentColor" stroke-width="3"/><path d="M50 32c-6-14-22-14-18-4 2 4 10 4 18 4zm0 0c6-14 22-14 18-4-2 4-10 4-18 4z" fill="none" stroke="currentColor" stroke-width="2.5"/></svg>',
     default: '<svg viewBox="0 0 100 100"><path d="M50 18 l22 22 -22 42 -22 -42z" fill="none" stroke="currentColor" stroke-width="3"/><path d="M28 40h44" stroke="currentColor" stroke-width="2"/></svg>',
   };
-  const PH_BG = { Earrings: "#f3e6df", Necklaces: "#efe4d6", Rings: "#f1e8e1", Bracelets: "#ece3d9", Anklets: "#f5ebe4" };
+  const PH_BG = { Earrings: "#f3e6df", Necklaces: "#efe4d6", Rings: "#f1e8e1", Bracelets: "#ece3d9", Anklets: "#f5ebe4", "Gift Sets": "#f0e2dc" };
+  const placeholder = (cat) => `<span class="ph" style="background:${PH_BG[cat] || "#f3e6df"}">${ICONS[cat] || ICONS.default}</span>`;
+  const imgTag = (src, alt, cat, lazy = true) =>
+    `<img src="${esc(src)}" alt="${esc(alt)}" ${lazy ? 'loading="lazy"' : ""} data-cat="${esc(cat)}" draggable="false" />`;
+  const thumb = (p) => (p.images[0] ? imgTag(p.images[0], p.name, p.category) : placeholder(p.category));
 
-  function placeholder(category) {
-    return `<span class="ph" style="background:${PH_BG[category] || "#f3e6df"}">${ICONS[category] || ICONS.default}</span>`;
-  }
-  function media(p) {
-    if (p.image) return `<img src="${esc(p.image)}" alt="${esc(p.name)}" loading="lazy" data-cat="${esc(p.category)}" />`;
-    return placeholder(p.category);
-  }
   // A photo that can't load (wrong name, or .JPG vs .jpg on the live site) shows the placeholder instead of a broken icon
   document.addEventListener("error", (e) => {
     const img = e.target;
     if (img.tagName !== "IMG" || img.dataset.cat === undefined) return;
-    console.warn("[The Little LUXE] Photo not found — check the file name and capitals in products.js:", img.getAttribute("src"));
+    console.warn("[The Little LUXE] Photo not found — check the file name and capitals:", img.getAttribute("src"));
     img.outerHTML = placeholder(img.dataset.cat);
   }, true);
 
-  function priceHtml(p) {
-    return money(p.price) + (p.oldPrice ? ` <s>${money(p.oldPrice)}</s>` : "");
-  }
+  const priceHtml = (p) => money(p.price) + (p.oldPrice ? ` <s>${money(p.oldPrice)}</s>` : "");
 
   function card(p) {
     const badge = p.soldOut ? '<span class="badge sold">Sold out</span>'
       : p.isNew ? '<span class="badge">New</span>'
       : p.oldPrice ? '<span class="badge">Sale</span>' : "";
     return `<button type="button" class="card" data-id="${esc(p.id)}" aria-label="${esc(p.name)}, ${esc(money(p.price))}${p.soldOut ? ", sold out" : ""}">
-      <span class="card-img">${media(p)}${badge}</span>
+      <span class="card-img">${thumb(p)}${badge}</span>
       <span class="card-cat">${esc(p.category)}</span>
       <span class="card-name">${esc(p.name)}</span>
       <span class="card-price">${priceHtml(p)}</span>
     </button>`;
   }
 
-  // ----- New In -----
+  // ---------- New In ----------
   const newOnes = products.filter((p) => p.isNew).slice(0, 4);
   $("#new-grid").innerHTML = newOnes.map(card).join("");
   if (!newOnes.length) {
     $("#new").hidden = true;
-    document.querySelectorAll('a[href="#new"]').forEach((a) => (a.hidden = true));
+    $$('a[href="#new"]').forEach((a) => (a.hidden = true));
   }
 
-  // ----- Filters + Shop grid -----
-  const cats = ["All", ...new Set(products.map((p) => p.category))];
-  let current = "All";
-  $("#filters").innerHTML = cats.map((c) =>
-    `<button type="button" class="filter${c === "All" ? " active" : ""}" data-cat="${esc(c)}" aria-pressed="${c === "All"}">${esc(c)}</button>`).join("");
+  // ---------- Shop: filters, search, sort ----------
+  const BUDGET = "budget";
+  const cats = [...new Set(products.map((p) => p.category))];
+  const hasBudget = products.some((p) => p.price < CFG.budgetPrice);
+  const shop = { filter: "All", q: "", sort: "featured" };
 
+  $("#filters").innerHTML = ["All", ...cats, ...(hasBudget ? [BUDGET] : [])].map((c) =>
+    `<button type="button" class="filter${c === "All" ? " active" : ""}" data-cat="${esc(c)}" aria-pressed="${c === "All"}">${c === BUDGET ? "Under " + esc(money(CFG.budgetPrice)) : esc(c)}</button>`).join("");
+
+  // hide gift tiles that would show nothing
+  $$(".gift-tile[data-filter]").forEach((t) => {
+    const f = t.dataset.filter;
+    if ((f === BUDGET && !hasBudget) || (f !== BUDGET && !cats.includes(f))) t.hidden = true;
+  });
+
+  function matches(p) {
+    if (shop.filter === BUDGET ? p.price >= CFG.budgetPrice : shop.filter !== "All" && p.category !== shop.filter) return false;
+    if (!shop.q) return true;
+    const hay = `${p.name} ${p.category} ${p.description || ""}`.toLowerCase();
+    return shop.q.split(/\s+/).every((w) => hay.includes(w));
+  }
+  const sorters = {
+    featured: (a, b) => a._order - b._order,
+    new: (a, b) => (b.isNew - a.isNew) || (Number(b.id) - Number(a.id)) || (a._order - b._order),
+    "price-asc": (a, b) => a.price - b.price || a._order - b._order,
+    "price-desc": (a, b) => b.price - a.price || a._order - b._order,
+  };
   function renderShop() {
-    const list = current === "All" ? products : products.filter((p) => p.category === current);
+    const list = products.filter(matches).sort(sorters[shop.sort] || sorters.featured);
     $("#shop-grid").innerHTML = list.map(card).join("");
     $("#empty").hidden = list.length > 0;
+    $("#result-count").textContent = shop.q || shop.filter !== "All"
+      ? `${list.length} piece${list.length === 1 ? "" : "s"}${shop.q ? ` for “${shop.q}”` : ""}` : "";
   }
-  $("#filters").addEventListener("click", (e) => {
-    const b = e.target.closest(".filter");
-    if (!b) return;
-    current = b.dataset.cat;
-    document.querySelectorAll(".filter").forEach((f) => {
-      f.classList.toggle("active", f === b);
-      f.setAttribute("aria-pressed", f === b);
+  function setFilter(f) {
+    shop.filter = f;
+    $$(".filter").forEach((b) => {
+      const on = b.dataset.cat === f;
+      b.classList.toggle("active", on);
+      b.setAttribute("aria-pressed", on);
     });
     renderShop();
-  });
+  }
+  $("#filters").addEventListener("click", (e) => { const b = e.target.closest(".filter"); if (b) setFilter(b.dataset.cat); });
+  $("#search").addEventListener("input", (e) => { shop.q = e.target.value.trim().toLowerCase(); renderShop(); });
+  $("#sort").addEventListener("change", (e) => { shop.sort = e.target.value; renderShop(); });
   renderShop();
 
-  // ----- Product pop-up -----
-  const modal = $("#modal");
-  const modalCard = modal.querySelector(".modal-card");
-  let lastFocus = null;
-
+  // ---------- dialogs (product pop-up and bag) ----------
+  let openDlg = null, lastFocus = null;
   function lockScroll(on) {
     // both <html> and <body>, so the page behind doesn't scroll on iPhone
     root.style.overflow = on ? "hidden" : "";
     document.body.style.overflow = on ? "hidden" : "";
   }
+  function openDialog(el, focusEl) {
+    if (openDlg === el) return;
+    if (openDlg) openDlg.hidden = true; else lastFocus = document.activeElement;
+    openDlg = el;
+    el.hidden = false;
+    lockScroll(true);
+    setMenu(false);
+    (focusEl || el.querySelector("button")).focus();
+  }
+  function closeDialog() {
+    if (!openDlg) return;
+    openDlg.hidden = true;
+    openDlg = null;
+    lockScroll(false);
+    if (lastFocus && document.contains(lastFocus)) lastFocus.focus();
+    lastFocus = null;
+  }
+  const focusables = (el) => $$('a[href], button:not([disabled]), input, textarea, select, summary', el)
+    .filter((x) => !x.hidden && x.getClientRects().length);
+
+  // ---------- product pop-up with photo gallery ----------
+  const modal = $("#modal"), gallery = $("#m-gallery");
+  let current = null, gIndex = 0, gCount = 1;
+
+  function buildGallery(p) {
+    const imgs = p.images.length ? p.images : [null];
+    gCount = imgs.length; gIndex = 0;
+    gallery.innerHTML = imgs.map((src, i) =>
+      `<div class="slide">${src ? imgTag(src, gCount > 1 ? `${p.name} — photo ${i + 1}` : p.name, p.category, i > 0) : placeholder(p.category)}</div>`).join("");
+    gallery.scrollLeft = 0;
+    $("#m-dots").innerHTML = gCount > 1 ? imgs.map((_, i) => `<button type="button" data-dot="${i}" aria-label="Photo ${i + 1}"${i ? "" : ' aria-current="true"'}></button>`).join("") : "";
+    $("#m-prev").hidden = $("#m-next").hidden = gCount < 2;
+  }
+  function showIndex(i) {
+    gIndex = i;
+    $$("#m-dots button").forEach((d, k) => d.toggleAttribute("aria-current", k === i));
+    $$(".slide.zoomed", gallery).forEach((s) => s.classList.remove("zoomed"));
+  }
+  function goTo(i) {
+    showIndex((i + gCount) % gCount);
+    const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    gallery.scrollTo({ left: gIndex * gallery.clientWidth, behavior: reduce ? "auto" : "smooth" });
+  }
+  let scrollTimer;
+  gallery.addEventListener("scroll", () => {
+    // when someone swipes, follow along once the swipe settles
+    clearTimeout(scrollTimer);
+    scrollTimer = setTimeout(() => {
+      const i = Math.round(gallery.scrollLeft / Math.max(1, gallery.clientWidth));
+      if (i !== gIndex) showIndex(i);
+    }, 120);
+  }, { passive: true });
+  // Tap / click a photo to zoom in, move to look around, tap again to zoom out
+  const setOrigin = (img, e) => {
+    const r = img.getBoundingClientRect();
+    img.style.transformOrigin = `${((e.clientX - r.left) / r.width) * 100}% ${((e.clientY - r.top) / r.height) * 100}%`;
+  };
+  gallery.addEventListener("click", (e) => {
+    const img = e.target.closest(".slide img");
+    if (!img) return;
+    setOrigin(img, e);
+    img.parentElement.classList.toggle("zoomed");
+  });
+  gallery.addEventListener("pointermove", (e) => {
+    const img = e.target.closest(".slide.zoomed img");
+    if (img) setOrigin(img, e);
+  });
+
   function openProduct(id) {
-    const p = products.find((x) => String(x.id) === String(id));
+    const p = byId.get(String(id));
     if (!p) return;
-    lastFocus = document.activeElement;
-    $("#m-img").innerHTML = media(p);
+    current = p;
+    buildGallery(p);
     $("#m-cat").textContent = p.category;
     $("#m-name").textContent = p.name;
     $("#m-price").innerHTML = priceHtml(p);
     $("#m-desc").textContent = p.description || "";
-    $("#m-stock").textContent = p.soldOut ? "Currently sold out — message us to be notified when it's back." : "In stock · Ships in 2–4 days";
-    setOrderLink($("#m-order"),
-      `Hi ${S.name}! I'd like to ${p.soldOut ? "be notified about" : "order"}: ${p.name} (${money(p.price)})`,
-      p.soldOut ? "Notify me on WhatsApp" : "Order on WhatsApp");
-    modal.hidden = false;
-    lockScroll(true);
-    modal.querySelector(".modal-close").focus();
-  }
-  function closeModal() {
-    if (modal.hidden) return;
-    modal.hidden = true;
-    lockScroll(false);
-    if (lastFocus && document.contains(lastFocus)) lastFocus.focus();
+    $("#m-stock").textContent = p.soldOut
+      ? "Currently sold out — message us to be notified when it's back."
+      : `In stock · Dispatched in ${S.dispatchDays || "2–4"} working days`;
+    const add = $("#m-add");
+    add.disabled = p.soldOut;
+    add.textContent = p.soldOut ? "Sold out" : "Add to bag";
+    const order = $("#m-order");
+    order.hidden = !canOrder;
+    if (hasWhatsApp) {
+      order.href = waLink(`Hi ${S.name}! I'd like to ${p.soldOut ? "be notified about" : "order"}: ${p.name} (${money(p.price)})`);
+      order.textContent = p.soldOut ? "Notify me on WhatsApp" : "Buy now on WhatsApp";
+    } else if (igDM) {
+      order.href = igDM;
+      order.textContent = p.soldOut ? "Notify me on Instagram" : "Ask on Instagram";
+    }
+    openDialog(modal, modal.querySelector(".modal-close"));
   }
 
-  // ----- Mobile menu -----
-  const btn = $(".menu-btn"), nav = $(".nav");
+  // ---------- shopping bag ----------
+  const bagEl = $("#bag");
+  let bag = saved.get("tll-bag", []).filter((l) => byId.has(String(l.id)) && !byId.get(String(l.id)).soldOut);
+  const extras = Object.assign({ wrap: false, note: "", name: "" }, saved.get("tll-bag-extras", {}));
+  $("#gift-wrap").checked = !!extras.wrap;
+  $("#gift-note").value = extras.note || "";
+  $("#cust-name").value = extras.name || "";
+
+  function totals() {
+    const lines = bag.map((l) => ({ ...l, p: byId.get(String(l.id)) }));
+    const sub = lines.reduce((s, l) => s + l.p.price * l.qty, 0);
+    const ship = sub === 0 || sub >= CFG.freeShippingAbove ? 0 : CFG.shippingFee;
+    const gift = extras.wrap && sub > 0 ? CFG.giftWrapPrice : 0;
+    return { lines, sub, ship, gift, total: sub + ship + gift, count: lines.reduce((s, l) => s + l.qty, 0) };
+  }
+  function orderMessage(t) {
+    const out = [`Hi ${S.name}! I'd like to order:`, ""];
+    t.lines.forEach((l, i) => out.push(`${i + 1}. ${l.p.name} × ${l.qty} — ${money(l.p.price * l.qty)}`));
+    out.push("", `Subtotal: ${money(t.sub)}`, `Shipping: ${t.ship ? money(t.ship) : "Free"}`);
+    if (extras.wrap) out.push(`Gift wrap: ${t.gift ? money(t.gift) : "Free"}`);
+    out.push(`Total: ${money(t.total)}`);
+    if (extras.wrap && extras.note.trim()) out.push("", `Gift note: "${extras.note.trim()}"`);
+    if (extras.name.trim()) out.push("", `Name: ${extras.name.trim()}`);
+    return out.join("\n");
+  }
+  function saveBag() { saved.set("tll-bag", bag.map(({ id, qty }) => ({ id, qty }))); saved.set("tll-bag-extras", extras); }
+
+  function renderBag() {
+    const t = totals();
+    // header count
+    $("#bag-count").textContent = t.count;
+    $("#bag-count").hidden = t.count === 0;
+    $("#bag-btn").setAttribute("aria-label", `Open bag, ${t.count} item${t.count === 1 ? "" : "s"}`);
+    // items
+    $("#bag-items").innerHTML = t.lines.map((l) => `
+      <li class="bag-item">
+        <span class="bag-thumb">${thumb(l.p)}</span>
+        <span class="bag-info">
+          <span class="bag-name">${esc(l.p.name)}</span>
+          <span class="bag-price">${money(l.p.price)}</span>
+          <span class="qty" role="group" aria-label="Quantity of ${esc(l.p.name)}">
+            <button type="button" data-qty="-1" data-id="${esc(l.p.id)}" aria-label="One less">−</button>
+            <span aria-live="polite">${l.qty}</span>
+            <button type="button" data-qty="1" data-id="${esc(l.p.id)}" aria-label="One more">+</button>
+          </span>
+        </span>
+        <button type="button" class="bag-remove" data-remove="${esc(l.p.id)}" aria-label="Remove ${esc(l.p.name)}">Remove</button>
+      </li>`).join("");
+    const empty = t.count === 0;
+    $("#bag-empty").hidden = !empty;
+    $("#bag-extras").hidden = empty;
+    $("#bag-foot").hidden = empty;
+    $("#gift-note-wrap").hidden = !extras.wrap;
+    // free-shipping nudge
+    const left = CFG.freeShippingAbove - t.sub;
+    const note = $("#ship-note");
+    note.hidden = empty || CFG.freeShippingAbove <= 0;
+    const pct = Math.min(100, Math.round((t.sub / Math.max(1, CFG.freeShippingAbove)) * 100));
+    note.innerHTML = left > 0
+      ? `Add <strong>${money(left)}</strong> more for free shipping<span class="bar"><span style="width:${pct}%"></span></span>`
+      : `You've unlocked <strong>free shipping</strong><span class="bar"><span style="width:100%"></span></span>`;
+    // totals
+    $("#t-sub").textContent = money(t.sub);
+    $("#t-ship").textContent = t.ship ? money(t.ship) : "Free";
+    $("#t-gift-row").hidden = !extras.wrap;
+    $("#t-gift").textContent = t.gift ? money(t.gift) : "Free";
+    $("#t-total").textContent = money(t.total);
+    // checkout
+    const co = $("#checkout");
+    co.removeAttribute("aria-disabled");
+    if (hasWhatsApp) { co.href = waLink(orderMessage(t)); co.textContent = "Send order on WhatsApp"; }
+    else if (igDM) { co.href = igDM; co.textContent = "Send order on Instagram"; }
+    else { co.removeAttribute("href"); co.setAttribute("aria-disabled", "true"); co.textContent = "Ordering opens soon"; }
+    // UPI
+    const upi = String(S.upiId || "").trim();
+    $("#upi").hidden = !upi || empty;
+    if (upi && !empty) {
+      const link = `upi://pay?pa=${encodeURIComponent(upi)}&pn=${encodeURIComponent(S.name || "")}&am=${t.total.toFixed(2)}&cu=INR&tn=${encodeURIComponent((S.name || "") + " order")}`;
+      $("#upi-link").href = link;
+      $("#upi-link").textContent = `Pay ${money(t.total)} by UPI`;
+      if ($(".upi-qr").open) drawQR(link);
+    }
+  }
+  function addToBag(id) {
+    const p = byId.get(String(id));
+    if (!p || p.soldOut) return;
+    const line = bag.find((l) => String(l.id) === p.id);
+    if (line) line.qty = Math.min(line.qty + 1, 20); else bag.push({ id: p.id, qty: 1 });
+    saveBag(); renderBag();
+  }
+  function changeQty(id, d) {
+    const line = bag.find((l) => String(l.id) === String(id));
+    if (!line) return;
+    line.qty = Math.max(0, Math.min(20, line.qty + d));
+    if (!line.qty) bag = bag.filter((l) => l !== line);
+    saveBag(); renderBag();
+  }
+  function openBag() { renderBag(); openDialog(bagEl, bagEl.querySelector(".drawer-head .modal-close")); }
+
+  $("#gift-wrap").addEventListener("change", (e) => { extras.wrap = e.target.checked; saveBag(); renderBag(); });
+  $("#gift-note").addEventListener("input", (e) => { extras.note = e.target.value; saveBag(); renderBag(); });
+  $("#cust-name").addEventListener("input", (e) => { extras.name = e.target.value; saveBag(); renderBag(); });
+  // Instagram can't take a pre-written message, so copy the order for the customer to paste
+  $("#checkout").addEventListener("click", () => {
+    if (hasWhatsApp || !igDM) return;
+    const text = orderMessage(totals());
+    navigator.clipboard?.writeText(text).then(() => toast("Order copied — paste it in the Instagram chat"), () => {});
+  });
+
+  // UPI QR code (drawn only when someone opens it)
+  let qrLib = null;
+  async function drawQR(link) {
+    const box = $("#upi-qr-box");
+    try {
+      qrLib = qrLib || await new Promise((ok, fail) => {
+        if (window.qrcode) return ok(window.qrcode);
+        const s = document.createElement("script");
+        s.src = "https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js";
+        s.onload = () => ok(window.qrcode); s.onerror = fail;
+        document.head.appendChild(s);
+      });
+      const qr = qrLib(0, "M"); qr.addData(link); qr.make();
+      box.innerHTML = qr.createSvgTag({ cellSize: 4, margin: 2, scalable: true });
+      box.querySelector("svg")?.setAttribute("aria-label", "UPI payment QR code");
+    } catch { box.textContent = "Couldn't load the QR code — use the UPI button on your phone instead."; }
+  }
+  $(".upi-qr").addEventListener("toggle", (e) => { if (e.target.open) drawQR($("#upi-link").href); });
+
+  renderBag();
+
+  // ---------- toast ----------
+  let toastTimer;
+  function toast(text) {
+    const t = $("#toast");
+    t.textContent = text; t.hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => (t.hidden = true), 3500);
+  }
+
+  // ---------- reviews (only shown when you've added some) ----------
+  const reviews = (window.REVIEWS || []).filter((r) => r && r.text);
+  if (reviews.length) {
+    $("#reviews").hidden = false;
+    $("#reviews-list").innerHTML = reviews.map((r) => {
+      const n = Math.max(1, Math.min(5, Math.round(num(r.rating, 5))));
+      return `<figure class="review">
+        <div class="stars" role="img" aria-label="${n} out of 5 stars">${"★".repeat(n)}${"☆".repeat(5 - n)}</div>
+        <blockquote>“${esc(r.text)}”</blockquote>
+        <figcaption>${esc(r.name || "A happy customer")}${r.city ? ` · ${esc(r.city)}` : ""}</figcaption>
+      </figure>`;
+    }).join("");
+  }
+
+  // ---------- Google product info (for products that have photos) ----------
+  const withPhotos = products.filter((p) => p.images.length);
+  if (withPhotos.length) {
+    const ld = document.createElement("script");
+    ld.type = "application/ld+json";
+    ld.textContent = JSON.stringify({
+      "@context": "https://schema.org", "@type": "ItemList",
+      itemListElement: withPhotos.map((p, i) => ({
+        "@type": "ListItem", position: i + 1,
+        item: {
+          "@type": "Product", name: p.name, description: p.description || p.name, category: p.category,
+          image: p.images.map((u) => new URL(u, location.href).href),
+          brand: { "@type": "Brand", name: S.name },
+          offers: { "@type": "Offer", price: p.price, priceCurrency: "INR",
+            availability: p.soldOut ? "https://schema.org/OutOfStock" : "https://schema.org/InStock" },
+        },
+      })),
+    });
+    document.head.appendChild(ld);
+  }
+
+  // ---------- mobile menu ----------
+  const menuBtn = $(".menu-btn"), nav = $(".nav");
   function setMenu(open) {
     nav.classList.toggle("open", open);
-    btn.setAttribute("aria-expanded", String(open));
-    btn.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+    menuBtn.setAttribute("aria-expanded", String(open));
+    menuBtn.setAttribute("aria-label", open ? "Close menu" : "Open menu");
   }
-  btn.addEventListener("click", () => setMenu(!nav.classList.contains("open")));
+  menuBtn.addEventListener("click", () => setMenu(!nav.classList.contains("open")));
 
-  // ----- Clicks & keys -----
+  // ---------- clicks & keys ----------
   document.addEventListener("click", (e) => {
-    const c = e.target.closest(".card");
-    if (c) openProduct(c.dataset.id);
-    if (e.target.closest("[data-close]")) closeModal();
-    if (e.target.closest(".nav a") || (!e.target.closest(".nav") && !e.target.closest(".menu-btn"))) setMenu(false);
+    const t = e.target;
+    const c = t.closest(".card");
+    if (c) return openProduct(c.dataset.id);
+    if (t.closest("#bag-btn")) return openBag();
+    if (t.closest("#m-add") && current) { addToBag(current.id); return openBag(); }
+    if (t.closest("[data-close]")) return closeDialog();
+    const closeBag = t.closest("[data-close-bag]");
+    if (closeBag) {
+      closeDialog();
+      if (closeBag.dataset.goto) $(closeBag.dataset.goto)?.scrollIntoView({ behavior: "smooth" });
+      return;
+    }
+    const q = t.closest("[data-qty]");
+    if (q) return changeQty(q.dataset.id, Number(q.dataset.qty));
+    const rm = t.closest("[data-remove]");
+    if (rm) return changeQty(rm.dataset.remove, -99);
+    const dot = t.closest("[data-dot]");
+    if (dot) return goTo(Number(dot.dataset.dot));
+    if (t.closest("#m-prev")) return goTo(gIndex - 1);
+    if (t.closest("#m-next")) return goTo(gIndex + 1);
+    const tile = t.closest(".gift-tile[data-filter]");
+    if (tile) { setFilter(tile.dataset.filter); $("#shop").scrollIntoView({ behavior: "smooth" }); return; }
+    if (t.closest(".nav a") || (!t.closest(".nav") && !t.closest(".menu-btn"))) setMenu(false);
   });
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") {
-      if (!modal.hidden) closeModal();
-      else if (nav.classList.contains("open")) { setMenu(false); btn.focus(); }
+      if (openDlg) closeDialog();
+      else if (nav.classList.contains("open")) { setMenu(false); menuBtn.focus(); }
+      return;
     }
-    // keep keyboard focus inside the pop-up while it's open
-    if (e.key === "Tab" && !modal.hidden) {
-      const f = [...modalCard.querySelectorAll("a[href], button")].filter((el) => !el.hidden);
+    if (openDlg === modal && gCount > 1 && (e.key === "ArrowLeft" || e.key === "ArrowRight") && !/INPUT|TEXTAREA/.test(document.activeElement.tagName)) {
+      goTo(gIndex + (e.key === "ArrowRight" ? 1 : -1));
+    }
+    // keep keyboard focus inside the open pop-up / bag
+    if (e.key === "Tab" && openDlg) {
+      const f = focusables(openDlg);
       if (!f.length) return;
       const first = f[0], last = f[f.length - 1];
       if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
       else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
-      else if (!modalCard.contains(document.activeElement)) { e.preventDefault(); first.focus(); }
+      else if (!openDlg.contains(document.activeElement)) { e.preventDefault(); first.focus(); }
     }
   });
 
-  // ----- Contact section -----
+  // ---------- contact section ----------
   const wa = $("#wa-link"), ig = $("#ig-link");
   wa.hidden = !hasWhatsApp;
   if (hasWhatsApp) wa.href = waLink(`Hi ${S.name}! I have a question.`);
   ig.hidden = !igProfile;
   if (igProfile) ig.href = igProfile;
-  const noContact = !hasWhatsApp && !igProfile;
-  $(".contact-actions").hidden = noContact;
-  if (noContact) $("#contact-text").textContent = "We're getting ready to take orders — check back very soon!";
-  $("#year").textContent = new Date().getFullYear();
+  $(".contact-actions").hidden = !canOrder;
+  if (!canOrder) $("#contact-text").textContent = "We're getting ready to take orders — check back very soon!";
 })();

@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /brand/src/
+
+Sitemap: https://srujanchary02.github.io/the-little-luxe/sitemap.xml

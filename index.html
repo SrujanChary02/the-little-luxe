@@ -4,8 +4,9 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>The Little LUXE — Everyday Jewelry</title>
-  <meta name="description" content="The Little LUXE — dainty, everyday accessories and jewelry you'll never want to take off." />
+  <meta name="description" content="The Little LUXE — dainty, affordable everyday jewelry: earrings, necklaces, rings, bracelets and anklets you'll never want to take off." />
   <meta name="theme-color" content="#fbf7f2" />
+  <link rel="canonical" href="https://srujanchary02.github.io/the-little-luxe/" />
 
   <!-- Icons -->
   <link rel="icon" type="image/png" href="brand/favicon.png" />
@@ -14,12 +15,27 @@
   <!-- Link preview (WhatsApp, Instagram, Facebook). Update the URLs if you move to your own domain. -->
   <meta property="og:type" content="website" />
   <meta property="og:title" content="The Little LUXE — Everyday Jewelry" />
-  <meta property="og:description" content="Dainty, affordable everyday jewelry you'll never want to take off. Order on WhatsApp." />
+  <meta property="og:description" content="Dainty, affordable everyday jewelry you'll never want to take off." />
   <meta property="og:url" content="https://srujanchary02.github.io/the-little-luxe/" />
   <meta property="og:image" content="https://srujanchary02.github.io/the-little-luxe/brand/og-image.png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta name="twitter:card" content="summary_large_image" />
+
+  <!-- Tells Google what this site is -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Store",
+    "name": "The Little LUXE",
+    "description": "Dainty, affordable everyday jewelry.",
+    "url": "https://srujanchary02.github.io/the-little-luxe/",
+    "logo": "https://srujanchary02.github.io/the-little-luxe/brand/logo-primary-on-light.png",
+    "image": "https://srujanchary02.github.io/the-little-luxe/brand/og-image.png",
+    "currenciesAccepted": "INR",
+    "priceRange": "₹"
+  }
+  </script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -27,9 +43,10 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+  <a class="skip" href="#shop">Skip to products</a>
 
   <!-- ===== Announcement bar ===== -->
-  <div class="announce">Free shipping on orders above ₹999 · New pieces every week</div>
+  <div class="announce">Free shipping on orders above <span data-store="freeShippingAbove" data-money>₹999</span> · New pieces every week</div>
 
   <!-- ===== Header ===== -->
   <header class="header">
@@ -41,15 +58,22 @@
           <span class="logo-big">LUXE</span>
         </span>
       </a>
-      <button type="button" class="menu-btn" aria-label="Open menu" aria-expanded="false" aria-controls="site-nav">
-        <span></span><span></span>
-      </button>
       <nav class="nav" id="site-nav" aria-label="Main">
         <a href="#shop">Shop</a>
         <a href="#new">New In</a>
+        <a href="#gifts">Gifts</a>
         <a href="#about">About</a>
-        <a href="#contact">Contact</a>
+        <a href="#help">Help</a>
       </nav>
+      <div class="header-actions">
+        <button type="button" class="bag-btn" id="bag-btn" aria-label="Open bag, 0 items" aria-controls="bag">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14l-1.2 12H6.2z M9 8V6.5a3 3 0 0 1 6 0V8"/></svg>
+          <span class="bag-count" id="bag-count" hidden>0</span>
+        </button>
+        <button type="button" class="menu-btn" aria-label="Open menu" aria-expanded="false" aria-controls="site-nav">
+          <span></span><span></span>
+        </button>
+      </div>
     </div>
   </header>
 
@@ -85,7 +109,7 @@
       <div class="container promise-inner">
         <div><strong>Anti-tarnish</strong><span>Made for daily wear</span></div>
         <div><strong>Skin friendly</strong><span>Hypoallergenic finishes</span></div>
-        <div><strong>Gift ready</strong><span>Packed with love</span></div>
+        <div><strong>Gift ready</strong><span>Wrap &amp; note available</span></div>
       </div>
     </section>
 
@@ -107,9 +131,66 @@
           <p class="eyebrow">The collection</p>
           <h2>Shop All</h2>
         </div>
+        <div class="toolbar">
+          <label class="search">
+            <span class="sr-only">Search jewelry</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>
+            <input type="search" id="search" placeholder="Search earrings, rings, pearl…" autocomplete="off" />
+          </label>
+          <label class="sort">
+            <span>Sort</span>
+            <select id="sort">
+              <option value="featured">Featured</option>
+              <option value="new">Newest</option>
+              <option value="price-asc">Price: low to high</option>
+              <option value="price-desc">Price: high to low</option>
+            </select>
+          </label>
+        </div>
         <div class="filters" id="filters" role="group" aria-label="Filter by category"></div>
+        <p class="result-count" id="result-count" aria-live="polite"></p>
         <div class="grid" id="shop-grid"></div>
-        <p class="empty" id="empty" hidden>No pieces in this category yet — check back soon!</p>
+        <p class="empty" id="empty" hidden>No pieces match that — try another search or category.</p>
+      </div>
+    </section>
+
+    <!-- ===== Gifting ===== -->
+    <section id="gifts" class="section">
+      <div class="container">
+        <div class="section-head">
+          <p class="eyebrow">Gifting made easy</p>
+          <h2>Little gifts, big smiles</h2>
+        </div>
+        <div class="gift-tiles">
+          <button type="button" class="gift-tile" data-filter="Gift Sets">
+            <span class="gift-kicker">Curated</span>
+            <span class="gift-title">Gift Sets</span>
+            <span class="gift-text">Ready-matched pieces in our signature box.</span>
+            <span class="gift-link">Shop gift sets →</span>
+          </button>
+          <button type="button" class="gift-tile" data-filter="budget">
+            <span class="gift-kicker">Sweet &amp; simple</span>
+            <span class="gift-title">Under <span data-store="budgetPrice" data-money>₹499</span></span>
+            <span class="gift-text">Thoughtful little treats that don't break the bank.</span>
+            <span class="gift-link">Shop under <span data-store="budgetPrice" data-money>₹499</span> →</span>
+          </button>
+          <div class="gift-tile static">
+            <span class="gift-kicker">At checkout</span>
+            <span class="gift-title">Wrap &amp; note</span>
+            <span class="gift-text">Add gift wrapping (<span data-store="giftWrapPrice" data-money data-free="free">₹49</span>) and a handwritten note — we'll leave out the price.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Reviews (hidden until you add reviews in products.js) ===== -->
+    <section id="reviews" class="section section-alt" hidden>
+      <div class="container">
+        <div class="section-head">
+          <p class="eyebrow">Loved by you</p>
+          <h2>Kind words</h2>
+        </div>
+        <div class="reviews" id="reviews-list"></div>
       </div>
     </section>
 
@@ -134,6 +215,53 @@
       </div>
     </section>
 
+    <!-- ===== Help: care guide & FAQ ===== -->
+    <section id="help" class="section section-alt">
+      <div class="container help">
+        <div class="section-head">
+          <p class="eyebrow">Good to know</p>
+          <h2>Care &amp; questions</h2>
+        </div>
+        <div class="faq">
+          <details>
+            <summary>How do I place an order?</summary>
+            <p>Tap a piece, add it to your bag, then tap <strong>Send order</strong>. Your order opens as a ready-made message — just hit send and we'll confirm availability, payment and delivery with you.</p>
+          </details>
+          <details>
+            <summary>How much is shipping and how long does it take?</summary>
+            <p>Shipping is free on orders of <span data-store="freeShippingAbove" data-money>₹999</span> and above; smaller orders are <span data-store="shippingFee" data-money>₹79</span>. We dispatch in <span data-store="dispatchDays">2–4</span> working days, and delivery takes <span data-store="deliveryDays">4–8</span> working days after that. You'll get a tracking link once it ships.</p>
+          </details>
+          <details>
+            <summary>How can I pay?</summary>
+            <p>UPI (GPay, PhonePe, Paytm and others) or bank transfer. <span data-cod>Cash on delivery is available on request.</span></p>
+          </details>
+          <details>
+            <summary>Can I return or exchange a piece?</summary>
+            <p>For hygiene reasons we can't take back earrings or worn pieces. If something arrives damaged or isn't what you ordered, message us within <span data-store="returnDays">7</span> days of delivery with an unboxing photo or video and we'll replace or refund it. <a href="policies.html#returns">Full returns policy</a>.</p>
+          </details>
+          <details>
+            <summary>Will it tarnish? Can I wear it in water?</summary>
+            <p>Our pieces have an anti-tarnish finish made for daily wear, but no plated jewelry lasts forever if it's soaked often. Take it off for swimming, the gym and long showers, and it will keep its shine much longer.</p>
+          </details>
+          <details>
+            <summary>Jewelry care guide</summary>
+            <ul class="care">
+              <li><strong>Last on, first off.</strong> Put jewelry on after perfume, lotion and hairspray.</li>
+              <li><strong>Keep it dry.</strong> Remove before swimming, bathing or workouts.</li>
+              <li><strong>Wipe it gently</strong> with a soft dry cloth after wearing.</li>
+              <li><strong>Store it separately</strong> in the pouch or a zip bag, away from humidity.</li>
+              <li><strong>Avoid chemicals</strong> like sanitiser and cleaning sprays on your pieces.</li>
+            </ul>
+          </details>
+          <details>
+            <summary>Do you do gift wrapping?</summary>
+            <p>Yes! Tick <em>Gift wrap</em> in your bag (<span data-store="giftWrapPrice" data-money data-free="free">₹49</span>) and add a note. We'll leave the price out of the parcel.</p>
+          </details>
+        </div>
+        <p class="help-more">Full details: <a href="policies.html#shipping">Shipping</a> · <a href="policies.html#returns">Returns &amp; refunds</a> · <a href="policies.html#privacy">Privacy</a> · <a href="policies.html#terms">Terms</a></p>
+      </div>
+    </section>
+
     <!-- ===== Contact ===== -->
     <section id="contact" class="section section-dark">
       <div class="container contact">
@@ -151,26 +279,82 @@
   <footer class="footer">
     <div class="container footer-inner">
       <span>© <span id="year"></span> The Little LUXE</span>
-      <span>Everyday jewelry, made to be loved.</span>
+      <nav class="footer-links" aria-label="Policies">
+        <a href="policies.html#shipping">Shipping</a>
+        <a href="policies.html#returns">Returns</a>
+        <a href="policies.html#privacy">Privacy</a>
+        <a href="policies.html#terms">Terms</a>
+      </nav>
     </div>
   </footer>
 
-  <!-- ===== Product modal ===== -->
+  <!-- ===== Product pop-up ===== -->
   <div class="modal" id="modal" hidden>
     <div class="modal-backdrop" data-close></div>
     <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="m-name">
       <button type="button" class="modal-close" data-close aria-label="Close">×</button>
-      <div class="modal-img" id="m-img"></div>
+      <div class="modal-img">
+        <div class="gallery" id="m-gallery" aria-label="Product photos"></div>
+        <button type="button" class="gal-arrow prev" id="m-prev" aria-label="Previous photo" hidden>‹</button>
+        <button type="button" class="gal-arrow next" id="m-next" aria-label="Next photo" hidden>›</button>
+        <div class="gal-dots" id="m-dots"></div>
+      </div>
       <div class="modal-body">
         <p class="eyebrow" id="m-cat"></p>
         <h3 id="m-name"></h3>
         <p class="price" id="m-price"></p>
         <p id="m-desc"></p>
         <p class="stock" id="m-stock"></p>
-        <a class="btn btn-dark" id="m-order" target="_blank" rel="noopener">Order on WhatsApp</a>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-dark" id="m-add">Add to bag</button>
+          <a class="btn btn-line" id="m-order" target="_blank" rel="noopener">Order on WhatsApp</a>
+        </div>
       </div>
     </div>
   </div>
+
+  <!-- ===== Shopping bag ===== -->
+  <div class="drawer" id="bag" hidden>
+    <div class="drawer-backdrop" data-close-bag></div>
+    <aside class="drawer-panel" role="dialog" aria-modal="true" aria-labelledby="bag-title">
+      <div class="drawer-head">
+        <h3 id="bag-title">Your bag</h3>
+        <button type="button" class="modal-close static" data-close-bag aria-label="Close bag">×</button>
+      </div>
+      <div class="drawer-body">
+        <p class="ship-note" id="ship-note"></p>
+        <ul class="bag-items" id="bag-items"></ul>
+        <div class="bag-empty" id="bag-empty">
+          <p>Your bag is empty.</p>
+          <button type="button" class="btn btn-line" data-close-bag data-goto="#shop">Start shopping</button>
+        </div>
+        <div class="bag-extras" id="bag-extras">
+          <label class="check"><input type="checkbox" id="gift-wrap" /> <span>Gift wrap it <span class="muted">(<span data-store="giftWrapPrice" data-money data-free="free">₹49</span>)</span></span></label>
+          <label class="field" id="gift-note-wrap" hidden><span>Gift note</span><textarea id="gift-note" rows="2" maxlength="200" placeholder="Happy birthday! Love, …"></textarea></label>
+          <label class="field"><span>Your name</span><input type="text" id="cust-name" autocomplete="name" maxlength="60" placeholder="So we know who's ordering" /></label>
+        </div>
+      </div>
+      <div class="drawer-foot" id="bag-foot">
+        <dl class="totals">
+          <div><dt>Subtotal</dt><dd id="t-sub"></dd></div>
+          <div><dt>Shipping</dt><dd id="t-ship"></dd></div>
+          <div id="t-gift-row" hidden><dt>Gift wrap</dt><dd id="t-gift"></dd></div>
+          <div class="grand"><dt>Total</dt><dd id="t-total"></dd></div>
+        </dl>
+        <a class="btn btn-dark btn-block" id="checkout" target="_blank" rel="noopener">Send order on WhatsApp</a>
+        <div class="upi" id="upi" hidden>
+          <a class="btn btn-line btn-block" id="upi-link">Pay by UPI</a>
+          <details class="upi-qr">
+            <summary>On a computer? Scan the QR code</summary>
+            <div id="upi-qr-box"></div>
+          </details>
+          <p class="muted small">After paying, send the screenshot with your order so we can confirm it quickly.</p>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
   <script src="products.js"></script>
   <script src="app.js"></script>

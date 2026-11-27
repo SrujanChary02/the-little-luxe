@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Policies — The Little LUXE</title>
+  <meta name="description" content="Shipping, returns & refunds, privacy and terms for The Little LUXE." />
+  <meta name="theme-color" content="#fbf7f2" />
+  <link rel="canonical" href="https://srujanchary02.github.io/the-little-luxe/policies.html" />
+  <link rel="icon" type="image/png" href="brand/favicon.png" />
+  <link rel="apple-touch-icon" href="brand/apple-touch-icon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="policies-page">
+  <header class="header">
+    <div class="container header-inner">
+      <a href="./" class="logo" aria-label="The Little LUXE home">
+        <svg class="logo-gem" viewBox="0 0 80 64" aria-hidden="true"><path d="M22 4 H58 L76 20 L40 60 L4 20 Z M4 20 H76 M22 4 L30 20 L40 60 M58 4 L50 20 L40 60 M30 20 L40 4 L50 20"/></svg>
+        <span class="logo-words"><span class="logo-small">The Little</span><span class="logo-big">LUXE</span></span>
+      </a>
+      <a href="./#shop" class="btn btn-line back-btn">Back to shop</a>
+    </div>
+  </header>
+
+  <main class="section">
+    <div class="container policy">
+      <p class="eyebrow">The small print</p>
+      <h1>Policies</h1>
+      <nav class="policy-toc" aria-label="On this page">
+        <a href="#shipping">Shipping</a><a href="#returns">Returns &amp; refunds</a><a href="#privacy">Privacy</a><a href="#terms">Terms</a><a href="#contact">Contact</a>
+      </nav>
+
+      <section id="shipping">
+        <h2>Shipping &amp; delivery</h2>
+        <ul>
+          <li>We ship across India.</li>
+          <li>Orders of <span data-store="freeShippingAbove" data-money>₹999</span> and above ship free. Smaller orders have a flat shipping charge of <span data-store="shippingFee" data-money>₹79</span>.</li>
+          <li>Orders are dispatched within <span data-store="dispatchDays">2–4</span> working days of payment confirmation, and usually arrive <span data-store="deliveryDays">4–8</span> working days after dispatch, depending on your location.</li>
+          <li>You'll receive a tracking link once your order ships.</li>
+          <li>Delays caused by the courier, weather or public holidays are outside our control, but we'll always help you follow up.</li>
+        </ul>
+      </section>
+
+      <section id="returns">
+        <h2>Returns, exchanges &amp; refunds</h2>
+        <ul>
+          <li>For hygiene reasons, earrings and pieces that have been worn can't be returned or exchanged.</li>
+          <li>If your order arrives damaged, defective or isn't what you ordered, message us within <span data-store="returnDays">7</span> days of delivery with an unboxing video or clear photos of the item and packaging.</li>
+          <li>Once we've confirmed the issue, we'll send a replacement or issue a full refund (including shipping) — your choice, subject to stock.</li>
+          <li>Approved refunds are sent to the original payment method within 5–7 working days.</li>
+          <li>Orders can be cancelled before they're dispatched for a full refund. Once shipped, an order can't be cancelled.</li>
+        </ul>
+      </section>
+
+      <section id="privacy">
+        <h2>Privacy</h2>
+        <ul>
+          <li>When you order, we use your name, phone number and delivery address only to process, ship and support your order.</li>
+          <li>We never sell or share your details with anyone except the courier delivering your parcel.</li>
+          <li>This website does not use advertising or tracking cookies. Your shopping bag is saved only in your own browser.</li>
+          <li>Ask us at any time to see or delete the details we hold about you.</li>
+        </ul>
+      </section>
+
+      <section id="terms">
+        <h2>Terms</h2>
+        <ul>
+          <li>All prices are in Indian Rupees (₹). Orders are confirmed once payment is received.</li>
+          <li>Product photos are as accurate as we can make them; small variations in colour and finish are natural.</li>
+          <li>Our jewelry is fashion jewelry with an anti-tarnish finish — not solid gold or silver. With the care tips on our site it will stay beautiful for a long time.</li>
+          <li>We may update prices, products and these policies from time to time. The version on this page when you order applies to your order.</li>
+        </ul>
+      </section>
+
+      <section id="contact">
+        <h2>Contact</h2>
+        <p id="policy-contact">For any question about an order, message us and we'll get back to you as soon as possible.</p>
+      </section>
+
+      <p class="policy-updated">Last updated: <span id="updated">27 November 2026</span></p>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <span>© <span id="year"></span> The Little LUXE</span>
+      <a href="./">Back to shop</a>
+    </div>
+  </footer>
+
+  <script src="products.js"></script>
+  <script>
+    (function () {
+      var S = window.STORE || {}, cur = S.currency || "₹";
+      function money(n) { return cur + Number(n || 0).toLocaleString("en-IN"); }
+      document.querySelectorAll("[data-store]").forEach(function (el) {
+        var v = S[el.dataset.store];
+        if (v == null || v === "") return;
+        el.textContent = "money" in el.dataset ? money(v) : v;
+      });
+      document.getElementById("year").textContent = new Date().getFullYear();
+      var wa = String(S.whatsapp || "").replace(/\D/g, ""), parts = [];
+      if (wa.length >= 10) parts.push('WhatsApp: <a href="https://wa.me/' + wa + '">+' + wa + "</a>");
+      if (S.email) parts.push('Email: <a href="mailto:' + S.email + '">' + S.email + "</a>");
+      if (S.instagram) parts.push('Instagram: <a href="https://instagram.com/' + S.instagram.replace(/^@/, "") + '">@' + S.instagram.replace(/^@/, "") + "</a>");
+      if (parts.length) document.getElementById("policy-contact").innerHTML += "<br>" + parts.join("<br>");
+    })();
+  </script>
+</body>
+</html>
