@@ -1,0 +1,69 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<!-- Logo source. Rendered to PNG/PDF by brand/src/render.sh. Use ?v=primary|horizontal|monogram|square&c=ink|light -->
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,400;1,500&family=Jost:wght@300;400&display=block" rel="stylesheet" />
+<style>
+  :root { --ink:#2b2420; --gold:#b8925a; --gold-light:#d4b483; --ivory:#fbf7f2; --blush:#f3e6df; }
+  @page { size: 1000px 560px; margin: 0; }
+  html, body { margin: 0; background: transparent; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { width: 100vw; height: 100vh; display: grid; place-items: center; overflow: hidden; }
+  .c-ink   { --fg: var(--ink);   --accent: var(--gold); }
+  .c-light { --fg: var(--ivory); --accent: var(--gold-light); }
+  .serif { font-family: "Cormorant Garamond", serif; }
+
+  .gem path { fill: none; stroke: currentColor; stroke-linejoin: round; }
+
+  /* Primary stacked logo */
+  .primary { text-align: center; color: var(--fg); }
+  .primary .gem { width: 58px; color: var(--accent); display: block; margin: 0 auto 16px; }
+  .little { display: flex; align-items: center; justify-content: center; gap: 20px;
+            font-style: italic; font-weight: 500; font-size: 50px; line-height: 1; color: var(--accent); }
+  .rule { width: 72px; height: 1.5px; background: var(--accent); }
+  .luxe { font-weight: 500; font-size: 156px; line-height: .95; letter-spacing: .26em; margin-right: -.26em; margin-top: 8px; }
+  .tag { font-family: Jost, sans-serif; font-weight: 300; font-size: 16px; letter-spacing: .55em; margin-right: -.55em;
+         text-transform: uppercase; margin-top: 22px; }
+
+  /* Horizontal logo */
+  .horizontal { display: flex; align-items: center; gap: 26px; color: var(--fg); }
+  .horizontal .gem { width: 44px; color: var(--accent); }
+  .horizontal .little { font-size: 60px; }
+  .horizontal .luxe { font-size: 78px; letter-spacing: .24em; margin: 0 -.24em 0 0; line-height: 1; }
+  .horizontal .words { display: flex; align-items: baseline; gap: 22px; }
+
+  /* Monogram: a ring with a gem, holding an italic L */
+  .monogram { width: 86vmin; height: 86vmin; }
+  .square { width: 100vw; height: 100vh; display: grid; place-items: center; }
+  .square.ivory { background: var(--ivory); }
+  .square.blush { background: var(--blush); }
+  .square .monogram { width: 66vmin; height: 66vmin; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+  const q = new URLSearchParams(location.search);
+  const v = q.get("v") || "primary", c = q.get("c") || "ink", bg = q.get("bg") || "";
+  const gem = `<svg class="gem" viewBox="0 0 80 64"><path stroke-width="2.6" d="M22 4 H58 L76 20 L40 60 L4 20 Z M4 20 H76 M22 4 L30 20 L40 60 M58 4 L50 20 L40 60 M30 20 L40 4 L50 20"/></svg>`;
+  const ring = `<svg class="monogram" viewBox="0 0 100 100">
+    <defs><mask id="m"><rect width="100" height="100" fill="white"/>
+      <path d="M43 9 H57 L63 17 L50 31 L37 17 Z" fill="black" stroke="black" stroke-width="7" stroke-linejoin="round"/></mask></defs>
+    <circle cx="50" cy="60" r="31" fill="none" stroke="var(--accent)" stroke-width="2.4" mask="url(#m)"/>
+    <path d="M43 9 H57 L63 17 L50 31 L37 17 Z M37 17 H63 M47 17 L50 9 L53 17" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-linejoin="round"/>
+    <text x="49" y="76" text-anchor="middle" font-family="Cormorant Garamond" font-style="italic" font-weight="500" font-size="44" fill="var(--fg)">L</text>
+  </svg>`;
+  const views = {
+    primary: `<div class="primary serif">${gem}
+      <div class="little"><span class="rule"></span><span>The Little</span><span class="rule"></span></div>
+      <div class="luxe">LUXE</div>${q.get("tag") === "0" ? "" : `<div class="tag">Everyday Jewelry</div>`}</div>`,
+    horizontal: `<div class="horizontal serif">${gem}<div class="words"><span class="little">The Little</span><span class="luxe">LUXE</span></div></div>`,
+    monogram: ring,
+    square: `<div class="square ${bg}">${ring}</div>`,
+  };
+  views.og = `<div class="square ${bg}">${views.primary}</div>`; // 1200x630 link-preview image
+  document.body.className = "c-" + c;
+  document.getElementById("root").outerHTML = views[v];
+</script>
+</body>
+</html>

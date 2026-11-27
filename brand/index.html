@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>The Little LUXE — Logo Kit</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;1,400&family=Jost:wght@300;400&display=swap" rel="stylesheet" />
+<style>
+  :root { --ink:#2b2420; --gold:#b8925a; --ivory:#fbf7f2; --blush:#f3e6df; --line:#e4d6ca; --muted:#7a6e66; }
+  * { box-sizing: border-box; margin: 0; }
+  body { font-family: Jost, sans-serif; font-weight: 300; background: var(--ivory); color: var(--ink); padding: 48px 16px 80px; }
+  .wrap { max-width: 1100px; margin: 0 auto; }
+  h1 { font-family: "Cormorant Garamond", serif; font-weight: 500; font-size: 2.6rem; }
+  h2 { font-family: "Cormorant Garamond", serif; font-weight: 500; font-size: 1.6rem; margin: 48px 0 16px; }
+  p.sub { color: var(--muted); margin-top: 6px; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 700px) { .row { grid-template-columns: 1fr; } }
+  .tile { border: 1px solid var(--line); background: #fff; padding: 28px; display: grid; place-items: center; min-height: 220px; }
+  .tile.dark { background: var(--ink); border-color: var(--ink); }
+  .tile img { max-width: 100%; max-height: 260px; }
+  .cap { font-size: .78rem; color: var(--muted); margin-top: 8px; }
+  .cap code { color: var(--ink); }
+  .swatches { display: flex; gap: 12px; flex-wrap: wrap; }
+  .sw { width: 140px; }
+  .sw div { height: 70px; border: 1px solid var(--line); }
+  .sw span { display: block; font-size: .8rem; margin-top: 6px; }
+  .small { display: flex; gap: 24px; align-items: end; flex-wrap: wrap; }
+  .small img { border: 1px solid var(--line); }
+  .round { border-radius: 50%; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>The Little LUXE — Logo Kit</h1>
+  <p class="sub">Every file sits in this folder. Use the <em>on-light</em> versions on white or cream, and the <em>on-dark</em> versions on dark photos or backgrounds.</p>
+
+  <h2>Primary logo</h2>
+  <div class="row">
+    <div><div class="tile"><img src="logo-primary-on-light.png" alt="Primary logo, dark text"></div><p class="cap"><code>logo-primary-on-light.png</code> · posters, packaging, website</p></div>
+    <div><div class="tile dark"><img src="logo-primary-on-dark.png" alt="Primary logo, light text"></div><p class="cap"><code>logo-primary-on-dark.png</code> · on photos & dark backgrounds</p></div>
+  </div>
+  <p class="cap">For printing stickers, tags or boxes, send the printer <code>logo-primary-print.pdf</code> (sharp at any size).</p>
+
+  <h2>Horizontal logo</h2>
+  <div class="row">
+    <div><div class="tile"><img src="logo-horizontal-on-light.png" alt="Horizontal logo"></div><p class="cap"><code>logo-horizontal-on-light.png</code> · website header, email signature</p></div>
+    <div><div class="tile dark"><img src="logo-horizontal-on-dark.png" alt="Horizontal logo, light"></div><p class="cap"><code>logo-horizontal-on-dark.png</code></p></div>
+  </div>
+
+  <h2>Monogram</h2>
+  <div class="row">
+    <div><div class="tile"><img src="monogram-on-light.png" alt="Monogram"></div><p class="cap"><code>monogram-on-light.png</code> · stickers, jewelry cards, watermark on photos</p></div>
+    <div><div class="tile dark"><img src="monogram-on-dark.png" alt="Monogram, light"></div><p class="cap"><code>monogram-on-dark.png</code></p></div>
+  </div>
+
+  <h2>Social & website icons</h2>
+  <div class="small">
+    <div><img class="round" src="instagram-profile.png" width="180" alt="Instagram profile picture"><p class="cap"><code>instagram-profile.png</code> · Instagram / WhatsApp Business photo</p></div>
+    <div><img src="apple-touch-icon.png" width="90" alt="App icon"><p class="cap"><code>apple-touch-icon.png</code></p></div>
+    <div><img src="favicon.png" width="32" alt="Favicon"><p class="cap"><code>favicon.png</code> · browser tab</p></div>
+  </div>
+
+  <h2>Brand colors</h2>
+  <div class="swatches">
+    <div class="sw"><div style="background:#2b2420"></div><span>Espresso · #2B2420</span></div>
+    <div class="sw"><div style="background:#b8925a"></div><span>Champagne Gold · #B8925A</span></div>
+    <div class="sw"><div style="background:#f3e6df"></div><span>Blush · #F3E6DF</span></div>
+    <div class="sw"><div style="background:#fbf7f2"></div><span>Ivory · #FBF7F2</span></div>
+  </div>
+  <p class="cap" style="margin-top:16px">Fonts: Cormorant Garamond (logo & headings) and Jost (body text). Both are free Google Fonts.</p>
+</div>
+</body>
+</html>

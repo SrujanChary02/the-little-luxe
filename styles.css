@@ -66,9 +66,19 @@ em { font-style: italic; color: var(--gold-dark); }
   border-bottom: 1px solid var(--line);
 }
 .header-inner { display: flex; align-items: center; justify-content: space-between; height: 72px; }
-.logo { display: flex; flex-direction: column; align-items: center; line-height: 1; }
-.logo-small { font-family: var(--serif); font-style: italic; font-size: .95rem; color: var(--gold-dark); }
-.logo-big { font-family: var(--serif); font-size: 1.9rem; letter-spacing: .32em; margin-right: -.32em; font-weight: 600; }
+.logo { display: flex; align-items: center; gap: 12px; line-height: 1; }
+.logo-gem { width: 24px; flex: none; color: var(--gold); }
+.logo-gem path { fill: none; stroke: currentColor; stroke-width: 3.2; stroke-linejoin: round; }
+.logo-words { display: flex; align-items: baseline; gap: 10px; white-space: nowrap; }
+.logo-small { font-family: var(--serif); font-style: italic; font-weight: 500; font-size: 1.5rem; color: var(--gold-dark); }
+.logo-big { font-family: var(--serif); font-size: 1.8rem; letter-spacing: .24em; margin-right: -.24em; font-weight: 500; }
+@media (max-width: 400px) {
+  .logo { gap: 8px; }
+  .logo-gem { width: 19px; }
+  .logo-words { gap: 7px; }
+  .logo-small { font-size: 1.2rem; }
+  .logo-big { font-size: 1.4rem; }
+}
 .nav { display: flex; gap: 36px; }
 .nav a { font-size: .78rem; letter-spacing: .18em; text-transform: uppercase; position: relative; }
 .nav a::after {
@@ -104,7 +114,8 @@ em { font-style: italic; color: var(--gold-dark); }
   background: radial-gradient(circle at 35% 30%, #fff 0%, var(--sand) 60%, #dcc3ae 100%);
   box-shadow: 0 30px 80px rgba(148,114,63,.18);
 }
-.hero-ring { position: relative; width: 48%; color: var(--gold); animation: float 6s ease-in-out infinite; }
+.hero-ring { position: relative; width: 60%; color: var(--gold); animation: float 6s ease-in-out infinite; }
+.monogram text { font-family: var(--serif); font-style: italic; font-weight: 500; font-size: 44px; fill: var(--ink); }
 @keyframes float { 50% { transform: translateY(-12px) rotate(4deg); } }
 @media (max-width: 760px) {
   .hero-inner { grid-template-columns: 1fr; min-height: 0; text-align: center; }
@@ -173,7 +184,8 @@ em { font-style: italic; color: var(--gold-dark); }
   aspect-ratio: 1; border-radius: 50% 50% 0 0; background: linear-gradient(160deg, var(--sand), var(--blush));
   display: grid; place-items: center;
 }
-.about-art span { font-family: var(--serif); font-size: 4rem; letter-spacing: .2em; color: var(--white); font-style: italic; }
+.about-art .monogram { width: 58%; color: var(--white); }
+.about-art .monogram text { fill: var(--white); }
 @media (max-width: 760px) { .about { grid-template-columns: 1fr; gap: 32px; } .about-art { max-width: 260px; } }
 
 /* Contact */
