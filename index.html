@@ -43,6 +43,28 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+  <!-- Shared gold / pearl / crystal finishes used by the jewelry artwork -->
+  <svg class="defs" width="0" height="0" aria-hidden="true" focusable="false">
+    <defs>
+      <linearGradient id="tll-gold" gradientUnits="userSpaceOnUse" x1="20" y1="20" x2="180" y2="180">
+        <stop offset="0" stop-color="#f8e8bd" /><stop offset=".3" stop-color="#d8b46a" /><stop offset=".55" stop-color="#a87d3a" />
+        <stop offset=".8" stop-color="#e6c784" /><stop offset="1" stop-color="#b88f4c" />
+      </linearGradient>
+      <radialGradient id="tll-pearl" cx=".35" cy=".3" r=".75">
+        <stop offset="0" stop-color="#ffffff" /><stop offset=".55" stop-color="#f6efe8" /><stop offset="1" stop-color="#d8c7b7" />
+      </radialGradient>
+      <linearGradient id="tll-crystal" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#ffffff" /><stop offset=".45" stop-color="#eef3f8" /><stop offset="1" stop-color="#c3d0de" />
+      </linearGradient>
+      <linearGradient id="tll-gold-wide" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="400" y2="500">
+        <stop offset="0" stop-color="#f8e8bd" /><stop offset=".3" stop-color="#d8b46a" /><stop offset=".55" stop-color="#a87d3a" />
+        <stop offset=".8" stop-color="#e6c784" /><stop offset="1" stop-color="#b88f4c" />
+      </linearGradient>
+      <filter id="tll-shadow" x="-30%" y="-30%" width="160%" height="160%">
+        <feDropShadow dx="0" dy="5" stdDeviation="5" flood-color="#7a5a2c" flood-opacity=".22" />
+      </filter>
+    </defs>
+  </svg>
   <a class="skip" href="#shop">Skip to products</a>
 
   <!-- ===== Announcement bar ===== -->
@@ -91,34 +113,67 @@
     <section class="hero">
       <div class="container hero-inner">
         <div class="hero-text">
-          <p class="eyebrow">Everyday accessories</p>
+          <p class="eyebrow eyebrow-line">Everyday accessories</p>
           <h1>Little luxuries<br /><em>for every day.</em></h1>
           <p class="lead">Dainty, affordable jewelry made to be worn from morning coffee to late-night plans — and never taken off.</p>
           <div class="hero-actions">
             <a href="#shop" class="btn btn-dark">Shop the collection</a>
             <a href="#new" class="btn btn-line">See what's new</a>
           </div>
+          <ul class="hero-points">
+            <li>Anti-tarnish</li><li>Skin friendly</li><li>Gift ready</li>
+          </ul>
         </div>
-        <div class="hero-art" aria-hidden="true">
-          <div class="hero-circle"></div>
-          <!-- Monogram: ring with a gem, holding an italic L -->
-          <svg class="hero-ring monogram" viewBox="0 0 100 100">
-            <defs><mask id="hero-mask"><rect width="100" height="100" fill="white"/>
-              <path d="M43 9 H57 L63 17 L50 31 L37 17 Z" fill="black" stroke="black" stroke-width="7" stroke-linejoin="round"/></mask></defs>
-            <circle cx="50" cy="60" r="31" fill="none" stroke="currentColor" stroke-width="2.4" mask="url(#hero-mask)"/>
-            <path d="M43 9 H57 L63 17 L50 31 L37 17 Z M37 17 H63 M47 17 L50 9 L53 17" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
-            <text x="49" y="76" text-anchor="middle">L</text>
-          </svg>
+        <div class="hero-visual" aria-hidden="true">
+          <div class="hero-arch-outline"></div>
+          <div class="hero-arch">
+            <svg class="hero-svg" viewBox="0 0 400 500">
+              <!-- delicate bead chain -->
+              <path d="M40 -10 C 70 250, 330 250, 360 -10" fill="none" stroke="url(#tll-gold-wide)" stroke-width="7" stroke-linecap="round" stroke-dasharray="0.1 11" />
+              <path d="M40 -10 C 70 250, 330 250, 360 -10" fill="none" stroke="url(#tll-gold-wide)" stroke-width="1.2" opacity=".7" />
+              <!-- pendant -->
+              <g filter="url(#tll-shadow)">
+                <circle cx="200" cy="198" r="7" fill="none" stroke="url(#tll-gold-wide)" stroke-width="3.5" />
+                <path d="M200 206 C 232 246, 242 278, 200 318 C 158 278, 168 246, 200 206 Z" fill="url(#tll-gold-wide)" />
+                <path d="M200 230 C 218 254, 222 274, 200 298 C 178 274, 182 254, 200 230 Z" fill="url(#tll-crystal)" />
+                <path d="M200 230 L 200 298 M186 262 H214" stroke="#ffffff" stroke-width="1.2" opacity=".7" />
+              </g>
+              <!-- floating pearls -->
+              <circle cx="92" cy="372" r="17" fill="url(#tll-pearl)" filter="url(#tll-shadow)" />
+              <circle cx="316" cy="398" r="12" fill="url(#tll-pearl)" filter="url(#tll-shadow)" />
+              <circle cx="262" cy="440" r="7" fill="url(#tll-pearl)" filter="url(#tll-shadow)" />
+              <circle cx="140" cy="430" r="5" fill="url(#tll-pearl)" />
+              <!-- sparkles -->
+              <g fill="url(#tll-gold-wide)">
+                <path transform="translate(300 300)" d="M0 -14 C 1.5 -3, 3 -1.5, 14 0 C 3 1.5, 1.5 3, 0 14 C -1.5 3, -3 1.5, -14 0 C -3 -1.5, -1.5 -3, 0 -14 Z" />
+                <path transform="translate(104 250) scale(.7)" d="M0 -14 C 1.5 -3, 3 -1.5, 14 0 C 3 1.5, 1.5 3, 0 14 C -1.5 3, -3 1.5, -14 0 C -3 -1.5, -1.5 -3, 0 -14 Z" />
+                <path transform="translate(330 170) scale(.5)" d="M0 -14 C 1.5 -3, 3 -1.5, 14 0 C 3 1.5, 1.5 3, 0 14 C -1.5 3, -3 1.5, -14 0 C -3 -1.5, -1.5 -3, 0 -14 Z" />
+              </g>
+            </svg>
+          </div>
+          <div class="hero-badge"><strong>New</strong><span>pieces every week</span></div>
         </div>
       </div>
     </section>
 
-    <!-- ===== Promise strip ===== -->
-    <section class="promise">
-      <div class="container promise-inner">
-        <div><strong>Anti-tarnish</strong><span>Made for daily wear</span></div>
-        <div><strong>Skin friendly</strong><span>Hypoallergenic finishes</span></div>
-        <div><strong>Gift ready</strong><span>Wrap &amp; note available</span></div>
+    <!-- ===== Gold ribbon ===== -->
+    <div class="marquee" aria-label="Anti-tarnish, skin friendly, gift ready, free shipping on bigger orders, new pieces every week">
+      <div class="marquee-track" aria-hidden="true">
+        <span>Anti-tarnish</span><i>✦</i><span>Skin friendly</span><i>✦</i><span>Gift ready</span><i>✦</i>
+        <span>Free shipping above <span data-store="freeShippingAbove" data-money>₹999</span></span><i>✦</i><span>New pieces every week</span><i>✦</i>
+        <span>Anti-tarnish</span><i>✦</i><span>Skin friendly</span><i>✦</i><span>Gift ready</span><i>✦</i>
+        <span>Free shipping above <span data-store="freeShippingAbove" data-money>₹999</span></span><i>✦</i><span>New pieces every week</span><i>✦</i>
+      </div>
+    </div>
+
+    <!-- ===== Shop by category ===== -->
+    <section id="categories" class="section cats-section">
+      <div class="container">
+        <div class="section-head">
+          <p class="eyebrow eyebrow-line">Find your piece</p>
+          <h2>Shop by category</h2>
+        </div>
+        <div class="cat-tiles" id="cat-tiles"></div>
       </div>
     </section>
 
@@ -126,7 +181,7 @@
     <section id="new" class="section">
       <div class="container">
         <div class="section-head">
-          <p class="eyebrow">Just dropped</p>
+          <p class="eyebrow eyebrow-line">Just dropped</p>
           <h2>New In</h2>
         </div>
         <div class="grid" id="new-grid"></div>
@@ -137,7 +192,7 @@
     <section id="shop" class="section section-alt">
       <div class="container">
         <div class="section-head">
-          <p class="eyebrow">The collection</p>
+          <p class="eyebrow eyebrow-line">The collection</p>
           <h2>Shop All</h2>
         </div>
         <div class="toolbar">
@@ -164,29 +219,30 @@
     </section>
 
     <!-- ===== Gifting ===== -->
-    <section id="gifts" class="section">
+    <section id="gifts" class="section gifts-section">
       <div class="container">
-        <div class="section-head">
-          <p class="eyebrow">Gifting made easy</p>
-          <h2>Little gifts, big smiles</h2>
-        </div>
-        <div class="gift-tiles">
-          <button type="button" class="gift-tile" data-filter="Gift Sets">
-            <span class="gift-kicker">Curated</span>
-            <span class="gift-title">Gift Sets</span>
-            <span class="gift-text">Ready-matched pieces in our signature box.</span>
-            <span class="gift-link">Shop gift sets →</span>
-          </button>
-          <button type="button" class="gift-tile" data-filter="budget">
-            <span class="gift-kicker">Sweet &amp; simple</span>
-            <span class="gift-title">Under <span data-store="budgetPrice" data-money>₹499</span></span>
-            <span class="gift-text">Thoughtful little treats that don't break the bank.</span>
-            <span class="gift-link">Shop under <span data-store="budgetPrice" data-money>₹499</span> →</span>
-          </button>
-          <div class="gift-tile static">
-            <span class="gift-kicker">At checkout</span>
-            <span class="gift-title">Wrap &amp; note</span>
-            <span class="gift-text">Add gift wrapping (<span data-store="giftWrapPrice" data-money data-free="free">₹49</span>) and a handwritten note — we'll leave out the price.</span>
+        <div class="gift-banner">
+          <div class="gift-copy">
+            <p class="eyebrow">Gifting made easy</p>
+            <h2>Little gifts,<br /><em>big smiles.</em></h2>
+            <p>Ready-matched gift sets, sweet treats under <span data-store="budgetPrice" data-money>₹499</span>, and gift wrapping with a handwritten note (<span data-store="giftWrapPrice" data-money data-free="free">₹49</span>) — we always leave the price out of the parcel.</p>
+            <div class="gift-ctas">
+              <button type="button" class="btn btn-gold" data-filter="Gift Sets">Shop gift sets</button>
+              <button type="button" class="btn btn-line-light" data-filter="budget">Under <span data-store="budgetPrice" data-money>₹499</span></button>
+            </div>
+          </div>
+          <div class="gift-art" aria-hidden="true">
+            <svg viewBox="0 0 200 200">
+              <circle cx="100" cy="104" r="78" fill="#3a302b" />
+              <g filter="url(#tll-shadow)">
+                <rect x="48" y="92" width="104" height="76" rx="3" fill="#f3dcd2" />
+                <rect x="40" y="74" width="120" height="24" rx="3" fill="#f8e7df" />
+                <rect x="92" y="74" width="16" height="94" fill="url(#tll-gold)" />
+                <path d="M100 74 C 82 46, 52 50, 66 68 C 72 76, 88 76, 100 74 Z M100 74 C 118 46, 148 50, 134 68 C 128 76, 112 76, 100 74 Z" fill="url(#tll-gold)" />
+              </g>
+              <circle cx="40" cy="150" r="7" fill="url(#tll-pearl)" /><circle cx="164" cy="160" r="5" fill="url(#tll-pearl)" />
+              <path fill="url(#tll-gold)" transform="translate(160 54) scale(.6)" d="M0 -14 C 1.5 -3, 3 -1.5, 14 0 C 3 1.5, 1.5 3, 0 14 C -1.5 3, -3 1.5, -14 0 C -3 -1.5, -1.5 -3, 0 -14 Z" />
+            </svg>
           </div>
         </div>
       </div>
@@ -196,7 +252,7 @@
     <section id="reviews" class="section section-alt" hidden>
       <div class="container">
         <div class="section-head">
-          <p class="eyebrow">Loved by you</p>
+          <p class="eyebrow eyebrow-line">Loved by you</p>
           <h2>Kind words</h2>
         </div>
         <div class="reviews" id="reviews-list"></div>
@@ -209,17 +265,20 @@
         <div class="about-art" aria-hidden="true">
           <svg class="monogram" viewBox="0 0 100 100">
             <defs><mask id="about-mask"><rect width="100" height="100" fill="white"/>
-              <path d="M43 9 H57 L63 17 L50 31 L37 17 Z" fill="black" stroke="black" stroke-width="7" stroke-linejoin="round"/></mask></defs>
-            <circle cx="50" cy="60" r="31" fill="none" stroke="currentColor" stroke-width="2" mask="url(#about-mask)"/>
-            <path d="M43 9 H57 L63 17 L50 31 L37 17 Z M37 17 H63 M47 17 L50 9 L53 17" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+              <path d="M43 9 H57 L63 17 L50 31 L37 17 Z" fill="black" stroke="black" stroke-width="7" stroke-linejoin="round"/></mask>
+              <linearGradient id="about-gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f8e8bd"/><stop offset=".45" stop-color="#c9a15a"/><stop offset=".75" stop-color="#9c7434"/><stop offset="1" stop-color="#e6c784"/></linearGradient></defs>
+            <circle cx="50" cy="60" r="31" fill="none" stroke="url(#about-gold)" stroke-width="2.4" mask="url(#about-mask)"/>
+            <path d="M43 9 H57 L63 17 L50 31 L37 17 Z" fill="url(#tll-crystal)" stroke="url(#about-gold)" stroke-width="1.5" stroke-linejoin="round"/>
+            <path d="M37 17 H63 M47 17 L50 9 L53 17" fill="none" stroke="url(#about-gold)" stroke-width="1" stroke-linejoin="round"/>
             <text x="49" y="76" text-anchor="middle">L</text>
           </svg>
         </div>
-        <div>
-          <p class="eyebrow">Our story</p>
-          <h2>Small pieces, big feelings.</h2>
+        <div class="about-copy">
+          <p class="eyebrow eyebrow-line">Our story</p>
+          <h2>Small pieces,<br /><em>big feelings.</em></h2>
           <p>The Little LUXE started with a simple idea: everyday jewelry should feel special without costing a fortune. Every piece is hand-picked for its delicate design, comfort and staying power — so you can layer, stack and wear it every single day.</p>
           <p>Whether it's a treat for yourself or a gift for someone you love, we hope our little luxuries become part of your story.</p>
+          <p class="signature">— with love, The Little LUXE</p>
         </div>
       </div>
     </section>
@@ -228,7 +287,7 @@
     <section id="help" class="section section-alt">
       <div class="container help">
         <div class="section-head">
-          <p class="eyebrow">Good to know</p>
+          <p class="eyebrow eyebrow-line">Good to know</p>
           <h2>Care &amp; questions</h2>
         </div>
         <div class="faq">
@@ -274,7 +333,7 @@
     <!-- ===== Contact ===== -->
     <section id="contact" class="section section-dark">
       <div class="container contact">
-        <p class="eyebrow">Say hello</p>
+        <p class="eyebrow eyebrow-line">Say hello</p>
         <h2>Order &amp; enquiries</h2>
         <p id="contact-text">Found something you love? Message us to order — we usually reply within a few hours.</p>
         <div class="contact-actions">
@@ -286,14 +345,36 @@
   </main>
 
   <footer class="footer">
-    <div class="container footer-inner">
-      <span>© <span id="year"></span> The Little LUXE</span>
-      <nav class="footer-links" aria-label="Policies">
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <a href="#top" class="logo logo-light" aria-label="The Little LUXE home">
+          <svg class="logo-gem" viewBox="0 0 80 64" aria-hidden="true"><path d="M22 4 H58 L76 20 L40 60 L4 20 Z M4 20 H76 M22 4 L30 20 L40 60 M58 4 L50 20 L40 60 M30 20 L40 4 L50 20"/></svg>
+          <span class="logo-words"><span class="logo-small">The Little</span><span class="logo-big">LUXE</span></span>
+        </a>
+        <p>Dainty everyday jewelry — anti-tarnish, skin friendly and made to be loved.</p>
+      </div>
+      <nav class="footer-col" aria-label="Shop">
+        <h4>Shop</h4>
+        <a href="#shop">All jewelry</a>
+        <a href="#new">New in</a>
+        <a href="#gifts">Gifts</a>
+      </nav>
+      <nav class="footer-col" aria-label="Help">
+        <h4>Help</h4>
+        <a href="#help">FAQ &amp; care</a>
         <a href="policies.html#shipping">Shipping</a>
         <a href="policies.html#returns">Returns</a>
+      </nav>
+      <nav class="footer-col" aria-label="About">
+        <h4>About</h4>
+        <a href="#about">Our story</a>
         <a href="policies.html#privacy">Privacy</a>
         <a href="policies.html#terms">Terms</a>
       </nav>
+    </div>
+    <div class="container footer-bottom">
+      <span>© <span id="year"></span> The Little LUXE</span>
+      <span>Everyday jewelry, made to be loved.</span>
     </div>
   </footer>
 

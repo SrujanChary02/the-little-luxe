@@ -125,17 +125,38 @@ window.TLL = { ready: new Promise((r) => (markReady = r)) };
   const byId = new Map(products.map((p) => [p.id, p]));
 
   // ---------- product images ----------
-  const ICONS = {
-    Earrings: '<svg viewBox="0 0 100 100"><circle cx="35" cy="22" r="4" fill="currentColor"/><path d="M35 26v10" stroke="currentColor" stroke-width="2"/><circle cx="35" cy="56" r="20" fill="none" stroke="currentColor" stroke-width="3"/><circle cx="68" cy="22" r="4" fill="currentColor"/><path d="M68 26v14" stroke="currentColor" stroke-width="2"/><path d="M68 40l-9 22h18z" fill="none" stroke="currentColor" stroke-width="3"/></svg>',
-    Necklaces: '<svg viewBox="0 0 100 100"><path d="M15 15 Q50 80 85 15" fill="none" stroke="currentColor" stroke-width="2.5"/><path d="M50 58 l8 10 -8 12 -8 -12z" fill="none" stroke="currentColor" stroke-width="3"/></svg>',
-    Rings: '<svg viewBox="0 0 100 100"><circle cx="50" cy="58" r="26" fill="none" stroke="currentColor" stroke-width="4"/><path d="M42 30 l8 -12 8 12 -8 6z" fill="none" stroke="currentColor" stroke-width="2.5"/></svg>',
-    Bracelets: '<svg viewBox="0 0 100 100"><ellipse cx="50" cy="50" rx="36" ry="22" fill="none" stroke="currentColor" stroke-width="4"/><circle cx="50" cy="72" r="5" fill="currentColor"/></svg>',
-    Anklets: '<svg viewBox="0 0 100 100"><path d="M14 40 Q50 75 86 40" fill="none" stroke="currentColor" stroke-width="2.5" stroke-dasharray="4 5"/><circle cx="34" cy="58" r="4" fill="currentColor"/><circle cx="50" cy="62" r="4" fill="currentColor"/><circle cx="66" cy="58" r="4" fill="currentColor"/></svg>',
-    "Gift Sets": '<svg viewBox="0 0 100 100"><rect x="20" y="42" width="60" height="40" fill="none" stroke="currentColor" stroke-width="3"/><rect x="16" y="32" width="68" height="12" fill="none" stroke="currentColor" stroke-width="3"/><path d="M50 32v50" stroke="currentColor" stroke-width="3"/><path d="M50 32c-6-14-22-14-18-4 2 4 10 4 18 4zm0 0c6-14 22-14 18-4-2 4-10 4-18 4z" fill="none" stroke="currentColor" stroke-width="2.5"/></svg>',
-    default: '<svg viewBox="0 0 100 100"><path d="M50 18 l22 22 -22 42 -22 -42z" fill="none" stroke="currentColor" stroke-width="3"/><path d="M28 40h44" stroke="currentColor" stroke-width="2"/></svg>',
+  // Illustrated "studio" artwork shown until a product has real photos (gold/pearl gradients live in index.html)
+  const G = 'url(#tll-gold)', P = 'url(#tll-pearl)', C = 'url(#tll-crystal)';
+  const floor = '<ellipse cx="100" cy="176" rx="52" ry="5" fill="#7a5a2c" opacity=".08"/>';
+  const ART = {
+    Earrings: `${floor}<g filter="url(#tll-shadow)">
+      <circle cx="72" cy="86" r="24" fill="none" stroke="${G}" stroke-width="6"/><circle cx="72" cy="124" r="12" fill="${P}"/>
+      <circle cx="132" cy="96" r="24" fill="none" stroke="${G}" stroke-width="6"/><circle cx="132" cy="134" r="12" fill="${P}"/></g>`,
+    Necklaces: `${floor}<path d="M28 30 C 60 140, 140 140, 172 30" fill="none" stroke="${G}" stroke-width="5" stroke-linecap="round" stroke-dasharray="0.1 8"/>
+      <g filter="url(#tll-shadow)"><circle cx="100" cy="112" r="4" fill="none" stroke="${G}" stroke-width="2.5"/>
+      <path d="M100 116 C 116 134, 120 148, 100 166 C 80 148, 84 134, 100 116 Z" fill="${G}"/>
+      <path d="M100 128 C 108 138, 110 146, 100 156 C 90 146, 92 138, 100 128 Z" fill="${C}" opacity=".9"/></g>`,
+    Rings: `${floor}<g filter="url(#tll-shadow)"><circle cx="100" cy="118" r="42" fill="none" stroke="${G}" stroke-width="9"/>
+      <path d="M90 76 L94 66 M110 76 L106 66" stroke="${G}" stroke-width="3"/>
+      <path d="M80 64 L90 50 H110 L120 64 L100 88 Z" fill="${C}" stroke="${G}" stroke-width="1.5" stroke-linejoin="round"/>
+      <path d="M80 64 H120 M90 50 L96 64 L100 88 L104 64 L110 50" fill="none" stroke="#b9c6d4" stroke-width="1"/></g>`,
+    Bracelets: `${floor}<g filter="url(#tll-shadow)"><ellipse cx="100" cy="100" rx="64" ry="36" fill="none" stroke="${G}" stroke-width="6"/>
+      <ellipse cx="100" cy="100" rx="64" ry="36" fill="none" stroke="#fff6dc" stroke-width="1" stroke-dasharray="2 10" opacity=".8"/>
+      <circle cx="100" cy="140" r="3" fill="${G}"/><circle cx="100" cy="152" r="10" fill="#3f6fb0"/><circle cx="100" cy="152" r="6" fill="#ffffff"/>
+      <circle cx="100" cy="152" r="3.2" fill="#1d3557"/><circle cx="100" cy="152" r="10" fill="none" stroke="${G}" stroke-width="2"/></g>`,
+    Anklets: `${floor}<path d="M22 64 C 60 130, 140 130, 178 64" fill="none" stroke="${G}" stroke-width="4" stroke-linecap="round" stroke-dasharray="0.1 7"/>
+      <g filter="url(#tll-shadow)" fill="${G}">
+      <path d="M68 116 c-4-6-12-2-8 5 l8 8 8-8 c4-7-4-11-8-5z"/><path d="M100 126 c-4-6-12-2-8 5 l8 8 8-8 c4-7-4-11-8-5z"/>
+      <path d="M132 116 c-4-6-12-2-8 5 l8 8 8-8 c4-7-4-11-8-5z"/></g>`,
+    "Gift Sets": `${floor}<g filter="url(#tll-shadow)"><rect x="52" y="92" width="96" height="74" rx="3" fill="#f3dcd2"/>
+      <rect x="46" y="76" width="108" height="22" rx="3" fill="#f7e6de"/><rect x="92" y="76" width="16" height="90" fill="${G}"/>
+      <path d="M100 76 C 84 52, 58 56, 70 72 C 76 79, 90 78, 100 76 Z M100 76 C 116 52, 142 56, 130 72 C 124 79, 110 78, 100 76 Z" fill="${G}"/></g>`,
+    default: `${floor}<g filter="url(#tll-shadow)"><path d="M62 70 L78 46 H122 L138 70 L100 140 Z" fill="${C}" stroke="${G}" stroke-width="2" stroke-linejoin="round"/>
+      <path d="M62 70 H138 M78 46 L90 70 L100 140 L110 70 L122 46 M90 70 L100 46 L110 70" fill="none" stroke="#b9c6d4" stroke-width="1"/></g>`,
   };
-  const PH_BG = { Earrings: "#f3e6df", Necklaces: "#efe4d6", Rings: "#f1e8e1", Bracelets: "#ece3d9", Anklets: "#f5ebe4", "Gift Sets": "#f0e2dc" };
-  const placeholder = (cat) => `<span class="ph" style="background:${PH_BG[cat] || "#f3e6df"}">${ICONS[cat] || ICONS.default}</span>`;
+  const TONE = { Earrings: "rose", Necklaces: "sand", Rings: "pearl", Bracelets: "sand", Anklets: "rose", "Gift Sets": "blush" };
+  const art = (cat) => `<svg viewBox="0 0 200 200" aria-hidden="true">${ART[cat] || ART.default}</svg>`;
+  const placeholder = (cat) => `<span class="ph tone-${TONE[cat] || "pearl"}">${art(cat)}</span>`;
   const imgTag = (src, alt, cat, lazy = true) =>
     `<img src="${esc(src)}" alt="${esc(alt)}" ${lazy ? 'loading="lazy"' : ""} data-cat="${esc(cat)}" draggable="false" />`;
   const thumb = (p) => (p.images[0] ? imgTag(p.images[0], p.name, p.category) : placeholder(p.category));
@@ -175,7 +196,7 @@ window.TLL = { ready: new Promise((r) => (markReady = r)) };
     const on = wish.has(p.id);
     return `<div class="card-wrap">
       <button type="button" class="card" data-id="${esc(p.id)}" aria-label="${esc(p.name)}, ${esc(money(p.price))}${p.soldOut ? ", sold out" : ""}">
-        <span class="card-img">${thumb(p)}${badge}</span>
+        <span class="card-img">${thumb(p)}${badge}<span class="card-quick" aria-hidden="true">Quick view</span></span>
         <span class="card-cat">${esc(p.category)}</span>
         <span class="card-name">${esc(p.name)}</span>
         <span class="card-price">${priceHtml(p)}</span>
@@ -202,8 +223,8 @@ window.TLL = { ready: new Promise((r) => (markReady = r)) };
   $("#filters").innerHTML = ["All", ...cats, ...(hasBudget ? [BUDGET] : [])].map((c) =>
     `<button type="button" class="filter${c === "All" ? " active" : ""}" data-cat="${esc(c)}" aria-pressed="${c === "All"}">${c === BUDGET ? "Under " + esc(money(CFG.budgetPrice)) : esc(c)}</button>`).join("");
 
-  // hide gift tiles that would show nothing
-  $$(".gift-tile[data-filter]").forEach((t) => {
+  // hide gift shortcuts that would show nothing
+  $$("[data-filter]").forEach((t) => {
     const f = t.dataset.filter;
     if ((f === BUDGET && !hasBudget) || (f !== BUDGET && !cats.includes(f))) t.hidden = true;
   });
@@ -240,6 +261,19 @@ window.TLL = { ready: new Promise((r) => (markReady = r)) };
   $("#search").addEventListener("input", (e) => { shop.q = e.target.value.trim().toLowerCase(); renderShop(); });
   $("#sort").addEventListener("change", (e) => { shop.sort = e.target.value; renderShop(); });
   renderShop();
+
+  // ---------- Shop by category ----------
+  const catCount = (c) => products.filter((p) => p.category === c).length;
+  if (cats.length > 1) {
+    $("#cat-tiles").innerHTML = cats.map((c) => `
+      <button type="button" class="cat-tile" data-filter="${esc(c)}">
+        <span class="cat-art">${placeholder(c)}</span>
+        <span class="cat-name">${esc(c)}</span>
+        <span class="cat-count">${catCount(c)} piece${catCount(c) === 1 ? "" : "s"}</span>
+      </button>`).join("");
+  } else {
+    $("#categories").hidden = true;
+  }
 
   // ---------- dialogs (product pop-up, bag, wishlist, account) ----------
   let openDlg = null, lastFocus = null;
@@ -609,7 +643,7 @@ window.TLL = { ready: new Promise((r) => (markReady = r)) };
     if (dot) return goTo(Number(dot.dataset.dot));
     if (t.closest("#m-prev")) return goTo(gIndex - 1);
     if (t.closest("#m-next")) return goTo(gIndex + 1);
-    const tile = t.closest(".gift-tile[data-filter]");
+    const tile = t.closest("[data-filter]");
     if (tile) { setFilter(tile.dataset.filter); $("#shop").scrollIntoView({ behavior: "smooth" }); return; }
     if (t.closest(".nav a") || (!t.closest(".nav") && !t.closest(".menu-btn"))) setMenu(false);
   });
