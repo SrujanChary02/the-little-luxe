@@ -1,4 +1,4 @@
-// ===== The Little LUXE — sign-in with Amazon Cognito (shared by the shop and the owner page) =====
+// ===== The Ruvi Collection — sign-in with Amazon Cognito (shared by the shop and the owner page) =====
 // Uses Cognito's own secure sign-in page (OAuth 2 with PKCE). Passwords never touch this website.
 (function () {
   const C = (window.STORE && window.STORE.aws) || {};
@@ -69,7 +69,7 @@
     if (!code || !saved || saved.state !== state) return;
     try {
       store(await tokenRequest({ grant_type: "authorization_code", code, redirect_uri: redirectUri(), code_verifier: saved.verifier }));
-    } catch (e) { console.warn("[The Little LUXE]", e); }
+    } catch (e) { console.warn("[The Ruvi Collection]", e); }
   }
 
   async function idToken() {

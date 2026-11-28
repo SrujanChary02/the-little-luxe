@@ -1,6 +1,6 @@
-# The Little LUXE
+# The Ruvi Collection
 
-Website for The Little LUXE — everyday accessories & jewelry.
+Website for The Ruvi Collection — everyday accessories & jewelry.
 Live at **https://srujanchary02.github.io/the-little-luxe/**
 
 Everything you'd normally change lives in **`products.js`**: contact details, shipping prices,
@@ -65,7 +65,7 @@ The "Kind words" section appears automatically once there's at least one.
 
 ## 5. Your own domain, Google & visitor stats
 
-- **Domain:** buy one (e.g. `shopthelittleluxe.com` or `thelittleluxe.co.in`). In your
+- **Domain:** buy one (e.g. `theruvicollection.com` or `theruvicollection.in`). In your
   registrar's DNS settings add four `A` records for `@` pointing to `185.199.108.153`,
   `185.199.109.153`, `185.199.110.153`, `185.199.111.153`, and a `CNAME` record for `www`
   pointing to `srujanchary02.github.io`. Then in GitHub → repo **Settings → Pages → Custom

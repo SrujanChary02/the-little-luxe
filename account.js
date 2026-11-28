@@ -1,4 +1,4 @@
-// ===== The Little LUXE — customer accounts (sign in, details, orders, wishlist sync) =====
+// ===== The Ruvi Collection — customer accounts (sign in, details, orders, wishlist sync) =====
 // Does nothing unless sign-in is set up (STORE.aws in products.js).
 (async function () {
   const A = window.TLLAuth;

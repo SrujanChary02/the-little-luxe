@@ -1,5 +1,5 @@
 #!/bin/bash
-# Deploys (or updates) The Little LUXE's AWS backend and fills in products.js.
+# Deploys (or updates) The Ruvi Collection's AWS backend and fills in products.js.
 # Usage:  bash aws/deploy.sh
 set -euo pipefail
 cd "$(dirname "$0")/.."
@@ -8,6 +8,7 @@ PROFILE="${AWS_PROFILE:-funny-shorts}"     # this Mac's profile for the personal
 EXPECTED_ACCOUNT="327712415896"            # never deploy anywhere else
 REGION="${REGION:-ap-south-1}"             # Mumbai — closest to customers in India
 STACK="tll-shop"
+AUTH_PREFIX="${AUTH_PREFIX:-theruvicollection}"   # sign-in page: https://<prefix>.auth.<region>.amazoncognito.com
 export AWS_PROFILE="$PROFILE" AWS_REGION="$REGION" AWS_PAGER=""
 
 ACCOUNT=$(aws sts get-caller-identity --query Account --output text)
@@ -30,7 +31,7 @@ aws cloudformation deploy \
   --stack-name "$STACK" \
   --template-file aws/template.yaml \
   --capabilities CAPABILITY_IAM \
-  --parameter-overrides "IdentityProviders=$PROVIDERS" \
+  --parameter-overrides "IdentityProviders=$PROVIDERS" "AuthDomainPrefix=$AUTH_PREFIX" \
   --no-fail-on-empty-changeset
 
 echo "Uploading the API code…"

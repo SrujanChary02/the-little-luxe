@@ -1,16 +1,16 @@
 // =====================================================================
-//  THE LITTLE LUXE — YOUR STORE SETTINGS, PRODUCTS & REVIEWS
+//  THE RUVI COLLECTION — YOUR STORE SETTINGS, PRODUCTS & REVIEWS
 //  This is the only file you need to edit to run the shop.
 // =====================================================================
 
 window.STORE = {
-  name: "The Little LUXE",
+  name: "The Ruvi Collection",
   currency: "₹",
 
   // ----- How customers reach you & pay (leave "" until you have them) -----
   whatsapp: "",        // your WhatsApp number with country code, e.g. "919876543210"
   instagram: "",       // your Instagram handle without the @
-  email: "",           // shown on the Policies page, e.g. "hello@thelittleluxe.co.in"
+  email: "",           // shown on the Policies page, e.g. "hello@theruvicollection.in"
   upiId: "",           // your UPI ID, e.g. "yourname@okaxis" — adds a "Pay by UPI" button at checkout
   // Until WhatsApp or Instagram is filled in, the site shows "Ordering opens soon".
 
@@ -30,13 +30,13 @@ window.STORE = {
   productsSheet: "",
 
   // ----- Optional: free, private visitor stats from goatcounter.com -----
-  // Sign up, pick a code (e.g. "thelittleluxe"), and put it here. Leave "" for no stats.
+  // Sign up, pick a code (e.g. "theruvicollection"), and put it here. Leave "" for no stats.
   statsCode: "",
 
   // ----- Sign-in, customer accounts & the owner page (AWS) -----
   // Filled in by aws/deploy.sh. Leave empty to turn accounts off (the wishlist still works).
   aws: {
-    authDomain: "https://thelittleluxe-shop.auth.ap-south-1.amazoncognito.com",   // Cognito sign-in page address
+    authDomain: "https://theruvicollection.auth.ap-south-1.amazoncognito.com",   // Cognito sign-in page address
     clientId: "c0gjimc82qdfh053f3o8k4s28",     // Cognito app client id (public, safe to share)
     apiUrl: "https://oue3go3du4ahlp4fsekgjs7bve0fuzal.lambda-url.ap-south-1.on.aws",       // the shop's API address
     cdnUrl: "https://d1zm4a7bfl396u.cloudfront.net",       // where product photos and the product list are served from
@@ -152,7 +152,7 @@ window.PRODUCTS = [
     price: 449,
     oldPrice: 549,
     images: [],
-    description: "A single sparkling crystal on a thin band — everyday luxe, no occasion needed.",
+    description: "A single sparkling crystal on a thin band — everyday sparkle, no occasion needed.",
   },
 ];
 

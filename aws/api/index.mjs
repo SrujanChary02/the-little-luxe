@@ -1,4 +1,4 @@
-// ===== The Little LUXE — shop API (AWS Lambda, Node.js 22) =====
+// ===== The Ruvi Collection — shop API (AWS Lambda, Node.js 22) =====
 // Customers:  GET /me · PUT /me/profile · PUT /me/wishlist · GET /me/orders · POST /me/orders
 // Owner:      GET /admin/orders · PATCH /admin/orders · GET|PUT /admin/products · POST /admin/photos
 // Every request must carry a valid Cognito ID token; owner routes also need the "admins" group.
@@ -122,7 +122,7 @@ async function route(method, path, event, body) {
     const now = new Date().toISOString();
     const id = randomBytes(4).toString("hex").toUpperCase();
     const order = {
-      number: `TLL-${id}`, createdAt: now, items, subtotal, shipping, giftWrap, total: subtotal + shipping + giftWrap,
+      number: `RUVI-${id}`, createdAt: now, items, subtotal, shipping, giftWrap, total: subtotal + shipping + giftWrap,
       giftNote: text(body.giftNote, 200), name: text(body.name, 60), phone: text(body.phone, 20), address: text(body.address, 300),
       email: user.email, unverifiedPrices: unverified, clientTotal: int(body.total ?? 0),
     };

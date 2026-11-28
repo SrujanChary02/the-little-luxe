@@ -74,17 +74,23 @@ em { font-style: italic; color: var(--gold-dark); }
 }
 .header-inner { display: flex; align-items: center; justify-content: space-between; height: 72px; }
 .logo { display: flex; align-items: center; gap: 12px; line-height: 1; }
-.logo-gem { width: 24px; flex: none; color: var(--gold); }
+.logo-gem { width: 30px; flex: none; color: var(--gold); }
 .logo-gem path { fill: none; stroke: currentColor; stroke-width: 3.2; stroke-linejoin: round; }
-.logo-words { display: flex; align-items: baseline; gap: 10px; white-space: nowrap; }
-.logo-small { font-family: var(--serif); font-style: italic; font-weight: 500; font-size: 1.5rem; color: var(--gold-dark); }
-.logo-big { font-family: var(--serif); font-size: 1.8rem; letter-spacing: .24em; margin-right: -.24em; font-weight: 500; }
+.logo-gem .gem-crown { fill: #c9666f; stroke: none; }      /* the ruby: a nod to "Ruvi" */
+.logo-gem .gem-pavilion { fill: #9a3440; stroke: none; }
+.logo-words { display: flex; flex-direction: column; align-items: flex-start; white-space: nowrap; }
+.logo-line { display: flex; align-items: baseline; gap: 8px; }
+.logo-small { font-family: var(--serif); font-style: italic; font-weight: 500; font-size: 1.45rem; color: var(--gold-dark); }
+.logo-big { font-family: var(--serif); font-size: 1.75rem; letter-spacing: .2em; margin-right: -.2em; font-weight: 500; }
+/* "COLLECTION" is spaced out to sit exactly under "The RUVI" */
+.logo-sub { font-family: var(--sans); font-weight: 400; font-size: .6rem; text-transform: uppercase; letter-spacing: .735em; margin-right: -.735em; margin-top: 3px; }
 @media (max-width: 400px) {
   .logo { gap: 8px; }
-  .logo-gem { width: 19px; }
-  .logo-words { gap: 7px; }
+  .logo-gem { width: 24px; }
+  .logo-line { gap: 6px; }
   .logo-small { font-size: 1.2rem; }
-  .logo-big { font-size: 1.4rem; }
+  .logo-big { font-size: 1.42rem; }
+  .logo-sub { font-size: .48rem; letter-spacing: .75em; margin-right: -.75em; }
 }
 .nav { display: flex; gap: 36px; margin-left: auto; margin-right: 28px; }
 @media (max-width: 1000px) { .nav { gap: 22px; margin-right: 18px; } }

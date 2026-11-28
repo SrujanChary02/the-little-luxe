@@ -1,13 +1,13 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Description: >
-  The Little LUXE - customer sign-in (Cognito), shop API (Lambda), orders/profiles (DynamoDB),
+  The Ruvi Collection - customer sign-in (Cognito), shop API (Lambda), orders/profiles (DynamoDB),
   product photos and product list (private S3 served through CloudFront).
   Deploy with aws/deploy.sh. Customer data (user pool, table, bucket) is kept if the stack is deleted.
 
 Parameters:
   AuthDomainPrefix:
     Type: String
-    Default: thelittleluxe-shop
+    Default: theruvicollection
     Description: Sign-in page address prefix (https://<prefix>.auth.<region>.amazoncognito.com)
   SiteOrigin:
     Type: String
@@ -58,8 +58,8 @@ Resources:
         EmailSendingAccount: COGNITO_DEFAULT
       VerificationMessageTemplate:
         DefaultEmailOption: CONFIRM_WITH_CODE
-        EmailSubject: Your The Little LUXE verification code
-        EmailMessage: "Welcome to The Little LUXE! Your verification code is {####}"
+        EmailSubject: Your verification code for The Ruvi Collection
+        EmailMessage: "Welcome to The Ruvi Collection! Your verification code is {####}"
       UserAttributeUpdateSettings:
         AttributesRequireVerificationBeforeUpdate: [email]
 
@@ -170,7 +170,7 @@ Resources:
     Type: AWS::CloudFront::Distribution
     Properties:
       DistributionConfig:
-        Comment: The Little LUXE photos and product list
+        Comment: The Ruvi Collection photos and product list
         Enabled: true
         HttpVersion: http2and3
         PriceClass: PriceClass_All

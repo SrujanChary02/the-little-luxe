@@ -1,4 +1,4 @@
-// ===== The Little LUXE — shop manager (owner only) =====
+// ===== The Ruvi Collection — shop manager (owner only) =====
 (async function () {
   const A = window.TLLAuth, S = window.STORE || {};
   const $ = (s, r = document) => r.querySelector(s);

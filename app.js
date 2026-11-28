@@ -1,4 +1,4 @@
-// ===== The Little LUXE — site logic (you normally don't need to edit this file) =====
+// ===== The Ruvi Collection — site logic (you normally don't need to edit this file) =====
 // Other scripts (account.js) talk to this one through window.TLL once TLL.ready resolves.
 let markReady;
 window.TLL = { ready: new Promise((r) => (markReady = r)) };
@@ -110,7 +110,7 @@ window.TLL = { ready: new Promise((r) => (markReady = r)) };
           description: o.description, isNew: yes(o.isnew), soldOut: yes(o.soldout),
         }));
       } catch (e) {
-        console.warn("[The Little LUXE] Couldn't load the Google Sheet — showing products.js instead.", e);
+        console.warn("[The Ruvi Collection] Couldn't load the Google Sheet — showing products.js instead.", e);
       }
     }
     return window.PRODUCTS || [];
@@ -166,7 +166,7 @@ window.TLL = { ready: new Promise((r) => (markReady = r)) };
   document.addEventListener("error", (e) => {
     const img = e.target;
     if (img.tagName !== "IMG" || img.dataset.cat === undefined) return;
-    console.warn("[The Little LUXE] Photo not found — check the file name and capitals:", img.getAttribute("src"));
+    console.warn("[The Ruvi Collection] Photo not found — check the file name and capitals:", img.getAttribute("src"));
     img.outerHTML = placeholder(img.dataset.cat);
   }, true);
 
