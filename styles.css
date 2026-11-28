@@ -15,7 +15,7 @@
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+html { scroll-behavior: smooth; scroll-padding-top: 88px; }
 body {
   font-family: var(--sans);
   font-weight: 300;
@@ -72,26 +72,22 @@ em { font-style: italic; color: var(--gold-dark); }
   background: rgba(251,247,242,.92); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--line);
 }
-.header-inner { display: flex; align-items: center; justify-content: space-between; height: 72px; }
-.logo { display: flex; align-items: center; gap: 12px; line-height: 1; }
-.logo-gem { width: 30px; flex: none; color: var(--gold); }
+.header-inner { display: flex; align-items: center; justify-content: space-between; height: 80px; }
+@media (max-width: 900px) { .header-inner { height: 72px; } }
+/* Stacked logo: ruby / — The — / RUVI / COLLECTION. Every size is in em, so changing
+   .logo's font-size scales the whole logo (bigger in the footer, smaller on phones). */
+.logo { display: flex; flex-direction: column; align-items: center; font-size: 1rem; line-height: 1; white-space: nowrap; }
+.logo-gem { width: 1.2em; flex: none; color: var(--gold); }
 .logo-gem path { fill: none; stroke: currentColor; stroke-width: 3.2; stroke-linejoin: round; }
 .logo-gem .gem-crown { fill: #c9666f; stroke: none; }      /* the ruby: a nod to "Ruvi" */
 .logo-gem .gem-pavilion { fill: #9a3440; stroke: none; }
-.logo-words { display: flex; flex-direction: column; align-items: flex-start; white-space: nowrap; }
-.logo-line { display: flex; align-items: baseline; gap: 8px; }
-.logo-small { font-family: var(--serif); font-style: italic; font-weight: 500; font-size: 1.45rem; color: var(--gold-dark); }
-.logo-big { font-family: var(--serif); font-size: 1.75rem; letter-spacing: .2em; margin-right: -.2em; font-weight: 500; }
-/* "COLLECTION" is spaced out to sit exactly under "The RUVI" */
-.logo-sub { font-family: var(--sans); font-weight: 400; font-size: .6rem; text-transform: uppercase; letter-spacing: .735em; margin-right: -.735em; margin-top: 3px; }
-@media (max-width: 400px) {
-  .logo { gap: 8px; }
-  .logo-gem { width: 24px; }
-  .logo-line { gap: 6px; }
-  .logo-small { font-size: 1.2rem; }
-  .logo-big { font-size: 1.42rem; }
-  .logo-sub { font-size: .48rem; letter-spacing: .75em; margin-right: -.75em; }
-}
+.logo-the { display: flex; align-items: center; gap: .4em; margin-top: .14em; }
+.logo-rule { width: .95em; height: 1px; background: var(--gold); }
+.logo-small { font-family: var(--serif); font-style: italic; font-weight: 500; font-size: .95em; line-height: .9; color: var(--gold-dark); }
+.logo-big { font-family: var(--serif); font-size: 1.8em; line-height: .8; letter-spacing: .2em; margin-right: -.2em; font-weight: 500; margin-top: .06em; }
+/* "COLLECTION" is spaced out to sit exactly under "RUVI" */
+.logo-sub { font-family: var(--sans); font-weight: 400; font-size: .5em; text-transform: uppercase; letter-spacing: .52em; margin-right: -.52em; margin-top: .7em; }
+@media (max-width: 900px) { .logo { font-size: .9rem; } }
 .nav { display: flex; gap: 36px; margin-left: auto; margin-right: 28px; }
 @media (max-width: 1000px) { .nav { gap: 22px; margin-right: 18px; } }
 .header-actions { display: flex; align-items: center; gap: 6px; }
@@ -701,7 +697,7 @@ h2 em { font-style: italic; color: var(--gold-dark); }
 .footer-ig { display: inline-flex; align-items: center; gap: 8px; margin-top: 14px; font-size: .88rem; color: var(--gold-light); }
 .footer-ig:hover { color: var(--ivory); }
 .footer-ig svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.6; }
-.logo-light { color: var(--ivory); width: max-content; }
+.logo-light { color: var(--ivory); width: max-content; font-size: 1.3rem; }
 .logo-light .logo-small { color: var(--gold-light); }
 .footer-col { display: grid; gap: 10px; align-content: start; font-size: .9rem; }
 .footer-col h4 { font-family: var(--sans); font-weight: 500; font-size: .7rem; letter-spacing: .22em; text-transform: uppercase; color: var(--ivory); margin-bottom: 6px; }
