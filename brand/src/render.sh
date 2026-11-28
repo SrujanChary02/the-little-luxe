@@ -24,6 +24,7 @@ shot logo-horizontal-on-dark.png    860 180 3   "v=horizontal&c=light"
 shot monogram-on-light.png          600 600 2   "v=monogram&c=ink"
 shot monogram-on-dark.png           600 600 2   "v=monogram&c=light"
 shot instagram-profile.png          1080 1080 1 "v=square&c=ink&bg=blush"
+shot instagram-profile-dark.png     1080 1080 1 "v=square&c=light&bg=ink"
 shot favicon.png                    512 512 1   "v=monogram&c=ink"
 shot apple-touch-icon.png           600 600 1   "v=square&c=ink&bg=ivory"
 sips -Z 180 apple-touch-icon.png >/dev/null   # Chrome can't render tiny windows, so shrink afterwards

@@ -57,6 +57,22 @@ window.TLL = { ready: new Promise((r) => (markReady = r)) };
     document.head.appendChild(sc);
   }
 
+  // ---------- "Our story": a gentle reveal the first time it scrolls into view ----------
+  const story = $(".about");
+  if (story && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    story.classList.add("will-reveal");
+    const check = () => {
+      const r = story.getBoundingClientRect();
+      if (r.top < innerHeight * 0.8 && r.bottom > 0) {
+        story.classList.add("in");
+        removeEventListener("scroll", check); removeEventListener("resize", check);
+      }
+    };
+    addEventListener("scroll", check, { passive: true });
+    addEventListener("resize", check);
+    check();
+  }
+
   // ---------- products: owner page (AWS) → Google Sheet → products.js ----------
   function parseCSV(text) {
     const rows = []; let row = [], field = "", q = false;
