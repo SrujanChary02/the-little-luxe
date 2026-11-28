@@ -642,6 +642,9 @@ h2 em { font-style: italic; color: var(--gold-dark); }
 .footer:has(> .footer-inner) { padding: 22px 0; }
 .footer-grid { display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: 32px; padding-bottom: 44px; }
 .footer-brand p { margin-top: 16px; max-width: 300px; font-size: .9rem; line-height: 1.7; }
+.footer-ig { display: inline-flex; align-items: center; gap: 8px; margin-top: 14px; font-size: .88rem; color: var(--gold-light); }
+.footer-ig:hover { color: var(--ivory); }
+.footer-ig svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.6; }
 .logo-light { color: var(--ivory); width: max-content; }
 .logo-light .logo-small { color: var(--gold-light); }
 .footer-col { display: grid; gap: 10px; align-content: start; font-size: .9rem; }

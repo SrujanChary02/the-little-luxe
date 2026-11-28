@@ -674,6 +674,12 @@ window.TLL = { ready: new Promise((r) => (markReady = r)) };
   if (hasWhatsApp) wa.href = waLink(`Hi ${S.name}! I have a question.`);
   ig.hidden = !igProfile;
   if (igProfile) ig.href = igProfile;
+  if (!hasWhatsApp && igDM) { // Instagram is the only way to order, so make it the main button
+    ig.href = igDM; ig.textContent = "Message us on Instagram";
+    ig.classList.replace("btn-line-light", "btn-gold");
+  }
+  const footIg = $("#footer-ig");
+  if (footIg && igProfile) { footIg.href = igProfile; footIg.hidden = false; $("#footer-ig-handle").textContent = "@" + igHandle; }
   $(".contact-actions").hidden = !canOrder;
   if (!canOrder) $("#contact-text").textContent = "We're getting ready to take orders — check back very soon!";
 

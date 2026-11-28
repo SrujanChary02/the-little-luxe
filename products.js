@@ -9,7 +9,7 @@ window.STORE = {
 
   // ----- How customers reach you & pay (leave "" until you have them) -----
   whatsapp: "",        // your WhatsApp number with country code, e.g. "919876543210"
-  instagram: "",       // your Instagram handle without the @
+  instagram: "the_ruvi_collection_22",   // your Instagram handle without the @
   email: "",           // shown on the Policies page, e.g. "hello@theruvicollection.in"
   upiId: "",           // your UPI ID, e.g. "yourname@okaxis" — adds a "Pay by UPI" button at checkout
   // Until WhatsApp or Instagram is filled in, the site shows "Ordering opens soon".
