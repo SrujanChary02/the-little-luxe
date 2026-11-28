@@ -45,6 +45,10 @@
   .square.blush { background: var(--blush); }
   .square.ink { background: radial-gradient(circle at 50% 42%, #40342d 0%, var(--ink) 72%); }
   .square .monogram { width: 78vmin; height: 78vmin; }
+  .square.white { background: #fff; }
+  /* Round profile picture with the full logo: scaled up and nudged so it sits inside a circle */
+  .badge { transform: scale(var(--k)); }
+  .badge .collection { font-weight: 400; }
 </style>
 </head>
 <body>
@@ -78,6 +82,7 @@
     monogram: ring,
     square: `<div class="square ${bg}">${ring}</div>`,
   };
+  views.badge = `<div class="square ${bg}"><div class="badge" style="--k:${q.get("k") || 1.5}; translate: 0 ${q.get("dy") || 0}px">${views.primary}</div></div>`; // round profile picture
   views.og = `<div class="square ${bg}">${views.primary}</div>`; // 1200x630 link-preview image
   document.body.className = "c-" + c;
   document.getElementById("root").outerHTML = views[v];
@@ -88,9 +93,10 @@
     if (!ref || !el) return;
     const inner = (n) => { const r = document.createRange(); r.selectNodeContents(n); return r.getBoundingClientRect().width; };
     const trail = (n) => parseFloat(getComputedStyle(n.querySelector(".ruvi") || n).letterSpacing) || 0;
-    const target = inner(ref) - trail(ref);
+    const k = ref.getBoundingClientRect().width / ref.offsetWidth || 1; // undo any scale() on the badge
+    const target = inner(ref) / k - trail(ref);
     const letters = el.textContent.length;
-    const natural = inner(el);
+    const natural = inner(el) / k;
     const ls = (target - natural) / (letters - 1);
     el.style.letterSpacing = ls + "px";
     el.style.marginRight = -ls + "px";

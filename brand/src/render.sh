@@ -25,6 +25,9 @@ shot monogram-on-light.png          600 600 2   "v=monogram&c=ink"
 shot monogram-on-dark.png           600 600 2   "v=monogram&c=light"
 shot instagram-profile.png          1080 1080 1 "v=square&c=ink&bg=blush"
 shot instagram-profile-dark.png     1080 1080 1 "v=square&c=light&bg=ink"
+shot instagram-logo-blush.png       1080 1080 1 "v=badge&c=ink&bg=blush&k=1.75&dy=-18"   # full logo, sized to fit a round profile picture
+shot instagram-logo-white.png       1080 1080 1 "v=badge&c=ink&bg=white&k=1.75&dy=-18"
+shot instagram-logo-dark.png        1080 1080 1 "v=badge&c=light&bg=ink&k=1.75&dy=-18"
 shot favicon.png                    512 512 1   "v=monogram&c=ink"
 shot apple-touch-icon.png           600 600 1   "v=square&c=ink&bg=ivory"
 sips -Z 180 apple-touch-icon.png >/dev/null   # Chrome can't render tiny windows, so shrink afterwards
